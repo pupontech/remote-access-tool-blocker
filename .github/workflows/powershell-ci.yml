@@ -96,6 +96,7 @@ jobs:
             'src/appcontrol/Run-RmmAppControl.bat'                    = 'Install-RmmAppControl.v*.ps1'
             'src/eset/Run-LolrmmUrlList.bat'                          = 'Get-LolrmmUrlList.v*.ps1'
             'src/eset/Run-LolrmmHipsList.bat'                         = 'Get-LolrmmHipsList.v*.ps1'
+            'revert/Run-Revert.bat'                                   = 'Revert-RemoteAccessBlock.v*.ps1'
           }
           foreach ($bat in $expect.Keys) {
             if (-not (Test-Path $bat)) { $fail += "${bat}: missing"; continue }

@@ -15,6 +15,8 @@
   The policy is Microsoft's AllowAll template plus deny rules for vendor signing certificates - see
   Build-RmmAppControl. Installing it again (e.g. a newer build) REPLACES the old copy (fixed policy ID).
   Log: %ProgramData%\RemoteAccessToolBlocker\RmmAppControl.log
+  Installing also copies the standalone undo tool to %SystemDrive%\RemoteAccessToolBlocker, so the
+  block can be reverted on that PC later without this kit (Run-Revert.bat there).
 #>
 [CmdletBinding()]
 param(
@@ -41,6 +43,12 @@ $activeDir = Join-Path $env:windir 'System32\CodeIntegrity\CiPolicies\Active'
 # Log folder under %ProgramData%. Deployment-specific branding goes here; keep it plain ASCII.
 $LogDirName = 'RemoteAccessToolBlocker'
 $logDir = Join-Path $env:ProgramData $LogDirName
+# Where the always-available standalone revert tool is installed on the PC.
+$InstallDir = Join-Path $env:SystemDrive 'RemoteAccessToolBlocker'
+# Captured at SCRIPT scope: inside a function $PSScriptRoot is the CALLER's script root,
+# not this file's, so a function that reads it directly resolves to the wrong folder.
+$ScriptRootHere = $PSScriptRoot
+$RepoRootHere = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 
 function Write-Log([string]$m) {
     Write-Host $m
@@ -49,6 +57,132 @@ function Write-Log([string]$m) {
         Add-Content -Encoding UTF8 -LiteralPath (Join-Path $logDir 'RmmAppControl.log') -Value ('{0}  {1}' -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $m)
     } catch { }
 }
+function Install-RevertTool {
+    # Copy the kit + the standalone revert tool to $InstallDir so the block can be undone
+    # on this PC without the original kit, the network, or the repository.
+    # A dated backup of any previous install is taken first. Never removes the old folder
+    # before the new copy is in place.
+    # Resolve by the FILES we need, not by a folder name: in the repo they live in
+    # revert\, but in a built release ZIP they sit loose beside this installer. Looking
+    # for a 'revert' directory made the kit layout silently skip the whole install.
+    $srcRoot = $null
+    $srcSub = $null
+    $candidates = @(
+        @{ root = $ScriptRootHere; sub = '' },          # flat kit layout (release ZIP)
+        @{ root = $ScriptRootHere; sub = 'revert' },    # repo layout (revert\)
+        @{ root = $RepoRootHere;   sub = '' },
+        @{ root = $RepoRootHere;   sub = 'revert' }
+    )
+    foreach ($c in $candidates) {
+        if (-not $c.root) { continue }
+        $dir = if ($c.sub) { Join-Path $c.root $c.sub } else { $c.root }
+        if (-not (Test-Path -LiteralPath $dir)) { continue }
+        if ((Get-ChildItem -Path (Join-Path $dir 'Run-Revert.bat') -File -ErrorAction SilentlyContinue) -or
+            (Get-ChildItem -Path (Join-Path $dir 'Revert-RemoteAccessBlock.v*.ps1') -File -ErrorAction SilentlyContinue)) {
+            $srcRoot = $c.root; $srcSub = $c.sub; break
+        }
+    }
+    if (-not $srcRoot) {
+        Write-Log "Revert tool not found next to this script - skipping the $InstallDir install."
+        return
+    }
+    $revDir = if ($srcSub) { Join-Path $srcRoot $srcSub } else { $srcRoot }
+
+    # 1. dated backup of any existing install
+    if (Test-Path -LiteralPath $InstallDir) {
+        $old = Join-Path $InstallDir 'backups'
+        if (Test-Path -LiteralPath $old) {
+            $keep = Join-Path ($InstallDir + '.backup-' + (Get-Date -Format 'yyyy-MM-dd_HHmmss')) 'backups'
+            try {
+                New-Item -ItemType Directory -Force -Path (Split-Path $keep -Parent) | Out-Null
+                Copy-Item -LiteralPath $old -Destination $keep -Recurse -Force
+                Write-Log "Backed up the previous revert-tool backups to $keep"
+            } catch { Write-Log "Could not back up previous backups: $($_.Exception.Message)" }
+        }
+    } else {
+        New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
+    }
+
+    # 2. copy the revert tool + its guide
+    $copied = 0
+    foreach ($item in @('Run-Revert.bat', 'Revert-RemoteAccessBlock.v*.ps1')) {
+        foreach ($f in @(Get-ChildItem -Path (Join-Path $revDir $item) -File -ErrorAction SilentlyContinue)) {
+            Copy-Item -LiteralPath $f.FullName -Destination (Join-Path $InstallDir $f.Name) -Force
+            $copied++
+        }
+    }
+    # the ESET removal guide: revert\docs\ in the repo, revert-docs\ in a release ZIP,
+    # or loose beside the scripts. Revert-RemoteAccessBlock.ps1 looks for it at
+    # <InstallDir>\docs\eset-remove-guide.txt, so copy its CONTENTS into that folder.
+    $destDocs = Join-Path $InstallDir 'docs'
+    $guideSrc = @(
+        (Join-Path $revDir 'docs'),
+        (Join-Path $srcRoot 'revert-docs'),
+        $revDir
+    ) | Where-Object { $_ -and (Test-Path -LiteralPath (Join-Path $_ 'eset-remove-guide.txt')) } | Select-Object -First 1
+    if ($guideSrc) {
+        New-Item -ItemType Directory -Force -Path $destDocs | Out-Null
+        Copy-Item -LiteralPath (Join-Path $guideSrc 'eset-remove-guide.txt') -Destination $destDocs -Force
+        $copied++
+        Write-Log "Copied the ESET removal guide from $guideSrc"
+    } else {
+        Write-Log "WARNING: eset-remove-guide.txt not found - the revert tool will print the steps instead."
+    }
+
+    # 3. the built policies, so -Restore and the window work from the installed copy.
+    #    Copy the CONTENTS into <InstallDir>\policy: -Destination <dir> would place the
+    #    source folder INSIDE it, giving <InstallDir>\policy\policy\... and no working
+    #    policy\variants\ at all (verified against a real copy).
+    if (Test-Path -LiteralPath $PolicyDir) {
+        $destPolicy = Join-Path $InstallDir 'policy'
+        New-Item -ItemType Directory -Force -Path $destPolicy | Out-Null
+        # Enumerate instead of using a wildcard: -LiteralPath does NOT expand '*', so
+        # a glob there matches nothing and leaves the destination empty; -Path would
+        # expand but reintroduces bracket-in-path hazards. Copy each entry explicitly.
+        $polItems = @(Get-ChildItem -LiteralPath $PolicyDir -Force -ErrorAction SilentlyContinue)
+        foreach ($item in $polItems) {
+            if ($item.PSIsContainer) {
+                $sub = Join-Path $destPolicy $item.Name
+                New-Item -ItemType Directory -Force -Path $sub | Out-Null
+                foreach ($child in @(Get-ChildItem -LiteralPath $item.FullName -Force -ErrorAction SilentlyContinue)) {
+                    Copy-Item -LiteralPath $child.FullName -Destination $sub -Force
+                }
+            } else {
+                Copy-Item -LiteralPath $item.FullName -Destination $destPolicy -Force
+            }
+        }
+        # the ESET removal guide is copied separately, so count only the policy tree here
+        $variants = @(Get-ChildItem -LiteralPath (Join-Path $destPolicy 'variants') -Filter '*.cip' -File -ErrorAction SilentlyContinue)
+        $polCount = @(Get-ChildItem -LiteralPath $destPolicy -Recurse -File -ErrorAction SilentlyContinue).Count
+        Write-Log "Copied $polCount policy file(s), $($variants.Count) variant(s), into $destPolicy"
+        if ($variants.Count -eq 0) { Write-Log "WARNING: no variants landed in $destPolicy - -Restore needs them." }
+    } else {
+        Write-Log "No policy folder at $PolicyDir - the installed copy cannot restore a policy by itself."
+    }
+
+    # 4. a short pointer file for whoever finds the folder
+    $readme = @(
+        'Remote-access tool block - standalone undo tool',
+        '',
+        'This folder was installed automatically when the block was applied to this PC.',
+        'It is deliberately kept here so the block can be removed later WITHOUT the original kit:',
+        '',
+        '    Run-Revert.bat                 undo the block (asks first, then backs up)',
+        '    Run-Revert.bat -WhatIf        dry run - show every step, change nothing',
+        '    Run-Revert.bat -Restore       put a previously backed-up block back',
+        '',
+        'Backups live in backups\<timestamp>\ and are never deleted automatically.',
+        'The ESET website list can only be removed by hand - ESET does not expose it to scripts -',
+        'so Run-Revert.bat opens ESET and docs\eset-remove-guide.txt for that part.',
+        '',
+        'To remove this folder, use Run-Revert.bat -RemoveFolder (it refuses unless the folder',
+        'is named RemoteAccessToolBlocker).'
+    )
+    Set-Content -LiteralPath (Join-Path $InstallDir 'README.txt') -Value $readme -Encoding UTF8
+
+    Write-Log "Standalone revert tool installed to $InstallDir ($copied item(s) copied)."
+}
+
 function Test-Admin {
     $p = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
     return $p.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -123,6 +257,8 @@ if ($Mode -in 'Enforce', 'Audit') {
         Write-Log "Copied to $activeDir - RESTART the PC to activate."
     }
     if ($Mode -eq 'Audit') { Write-Log 'AUDIT mode: nothing is blocked. Start a listed tool, then run Status to see the "would be blocked" event.' }
+    # make the undo tool available on this PC regardless of which kit installed the policy
+    try { Install-RevertTool } catch { Write-Log "Could not install the revert tool: $($_.Exception.Message)" }
 } elseif ($Mode -eq 'Remove') {
     Write-Log 'Removing policy ...'
     if (Test-Path -LiteralPath $ciTool) {

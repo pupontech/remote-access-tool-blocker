@@ -39,14 +39,57 @@ The App Control layer is the load-bearing one. The ESET layers are optional extr
 4. Tick or untick **TeamViewer / AnyDesk / Splashtop / RustDesk**. Ticked = blocked.
 5. Press **BLOCK**.
 
-To undo: press **UNDO**, then restart the PC. In the full kit, also take the website list back out of ESET — the
-guide that opens has the two-click steps.
+When the block is applied, the kit also copies a **standalone undo tool** to
+`C:\RemoteAccessToolBlocker` on that PC — see [Undoing it later](#undoing-it-later). It is there so the block can
+be reverted later without the original kit, the network, or this repository.
+
+To undo immediately: press **UNDO**, then restart the PC. In the full kit, also take the website list back out of
+ESET — the guide that opens has the two-click steps.
 
 The status line always shows the current state — **PROTECTED**, **TEST MODE** or **NOT protected** — and what each
 toggle is set to. **Refresh status** lists recent events: `[3077]` means a program was blocked, `[3076]` means one
 *would* have been blocked (audit mode).
 
-### Test before you enforce
+### Undoing it later
+
+The undo tool is installed on the PC itself, at:
+
+```
+C:\RemoteAccessToolBlocker\
+  Run-Revert.bat                          <- double-click this
+  Revert-RemoteAccessBlock.v2026-10-11.1.ps1
+  README.txt
+  docs\eset-remove-guide.txt
+  policy\                                 (the built policies, so it can put the block back)
+  backups\                                (created by the first revert)
+```
+
+It is placed there automatically when a block is applied, so **the block can be removed later without the original
+kit, the network, or this repository.** Because that folder is a permanent, scriptable tool sitting on the machine,
+note what it is: it lets anyone with local administrator rights undo the block. That is deliberate — the
+alternative is a PC you cannot un-block without hunting down the original kit.
+
+| Command | What it does |
+|---|---|
+| `Run-Revert.bat` | Undo the block. Backs up first, then removes the policy and opens ESET's removal guide. |
+| `Run-Revert.bat -WhatIf` | **Dry run** — shows every step and changes nothing. |
+| `Run-Revert.bat -Restore` | Put a previously backed-up block back, with its original toggles. |
+| `Run-Revert.bat -NoPause` | Don't wait for a key press at the end (remote/unattended use). |
+| `Run-Revert.bat -RemoveFolder` | After reverting, also delete the folder and its backups. |
+
+**Revert never destroys the ability to restore.** Before it removes anything it copies the installed policy, its
+toggles and mode, the generated ESET lists and a machine summary into `backups\<timestamp>\`, one dated folder per
+revert, never overwritten. `-Restore` reads those back.
+
+**The ESET website list is the one part it cannot do for you.** ESET's URL list is a UI import/paste with no
+scriptable interface, so the tool opens ESET, opens `docs\eset-remove-guide.txt`, and tells you exactly what to
+click. It backs up the generated list first so you can see precisely which entries were yours. If you pasted into
+ESET's own built-in list rather than a list you created, the guide warns you to check it was empty beforehand —
+the removal is not undoable from ESET's side.
+
+`-WhatIf` is the safe way to see what a revert would do on a live machine.
+
+## Test before you enforce
 
 Press **Test mode** first. It installs the same policy in **audit** mode: nothing is blocked, but Windows logs
 what would have been. Run the tool you expect to be blocked, then **Refresh status** and confirm you see a `3076`
@@ -228,6 +271,7 @@ src/appcontrol/    Build- / Install- / Run-RmmAppControl   (ONE shared copy, use
 src/eset/          Get-LolrmmUrlList  (website list)  and Get-LolrmmHipsList  (experimental path list)
 kits/full/         START-HERE.bat + RmmBlocker window   (App Control + ESET website list)
 kits/windows-only/ Remote-Tools-Block-Windows.bat + window (App Control only)
+revert/            Run-Revert.bat + Revert-RemoteAccessBlock  (standalone undo/restore tool)
 policy/            the prebuilt policies - 32 toggle combinations + signers.csv (generated output)
 docs/              how-it-works, eset-import-guide, testing, CHANGELOG
 archive/           the original ESET HIPS prototype, kept for history
@@ -235,6 +279,10 @@ archive/           the original ESET HIPS prototype, kept for history
 
 The scripts resolve the folders relative to themselves, so the repo layout works in place and a built release ZIP
 (which lays the scripts out side by side) works standalone.
+
+The revert tool follows the same rule in two ways: the kit resolves it either from `revert\` (repo) or from the
+loose files beside the installer (release ZIP), and once installed on a PC it resolves everything — its own scripts,
+the guide and the policies — from `C:\RemoteAccessToolBlocker\` alone.
 
 Scripts deployed to other machines carry their version in the filename — `Name.vYYYY-MM-DD.N.ps1`. The `.bat`
 launchers auto-detect the newest with `dir /b /o-n`, so superseded versions can be removed once a new one works.

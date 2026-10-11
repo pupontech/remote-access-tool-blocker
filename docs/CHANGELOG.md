@@ -2,6 +2,33 @@
 
 All notable changes to this project. Dates are the versioning dates carried in the script filenames.
 
+## Unreleased
+
+### Standalone revert / restore tool (`C:\RemoteAccessToolBlocker`)
+
+- **`revert/` — a self-contained undo tool** (`Run-Revert.bat` + `Revert-RemoteAccessBlock`). Applying a block now
+  installs a copy of it to `C:\RemoteAccessToolBlocker` on the PC, so the block can be removed later without the
+  original kit, the network, or the repository.
+- **Revert**: backs up the installed policy, its toggles and mode, the generated ESET lists and a machine summary
+  into `backups\<timestamp>\` (one dated folder per revert, never overwritten), then removes the App Control policy
+  and opens ESET with a removal guide. The repository path is untouched.
+- **Restore**: `-Restore` lists the dated backups and re-installs the policy with its original toggles, so the block
+  can be put back without the kit.
+- **`-WhatIf`** dry-runs the whole thing and reaches neither removal call.
+- **`-NoPause`** for remote/unattended use; **`-RemoveFolder`** to delete the folder and backups afterwards,
+  refusing unless the folder is actually named `RemoteAccessToolBlocker`.
+- Shipped inside both kit ZIPs and wired into `Install-RmmAppControl`, which copies it after a successful
+  Enforce/Audit install and takes a dated backup of any previous install first.
+- The ESET website list remains a manual removal — ESET exposes no scriptable interface for it — so the tool backs
+  up the generated list, opens ESET and prints the exact clicks, including a warning for the case where the entries
+  went into ESET's own built-in list rather than a list you created.
+
+Verified by execution, not inspection: both the repo layout and an extracted release ZIP install the tool
+correctly; policies land at `policy\variants\` with all 32 variants; a repeat install backs up the previous
+backups instead of clobbering them. Three defects were found and fixed that way — the release-ZIP layout was never
+detected, the ESET guide never copied, and the policies landed double-nested because `-LiteralPath` does not expand
+a `*` glob.
+
 ## 2026.10.11
 
 First public release. The work below was done as a single continuous effort on 2026-10-07, 2026-10-08 and

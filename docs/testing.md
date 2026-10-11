@@ -109,6 +109,32 @@ Windows 11 Pro build 26200, ESET Security 19.2.10, with the earlier three-toggle
   mode on one Home PC first.
 - **The ESET "Add list" button** — the button used to create a separate address list is documented by ESET but was
   not checked in the UI on the test machine.
+- **The revert tool never removes a real policy on real hardware.** Its *removal* path (`CiTool --remove-policy`,
+  the `CiPolicies\Active` delete, opening ESET) is the same code path as the already-verified `-Mode Remove`, but
+  the tool itself has only been exercised on Linux with stubbed Windows surfaces. Its file-handling logic — the
+  backup, the restore listing, the copy into `C:\RemoteAccessToolBlocker` — **has** been executed end to end and
+  verified on disk (see below).
+
+### The revert tool: what was actually executed
+
+Not a source-only review. The following were run against the real shipped scripts with synthetic
+directories standing in for Windows paths:
+
+| Checked by execution | Result |
+|---|---|
+| Kit copies the undo tool from the **repo layout** (`revert\`) | 4 items copied, guide and 32 variants land |
+| Kit copies it from an **extracted release ZIP** (loose files) | 3 items copied, 71 policy files, 32 variants |
+| Policies land at `policy\variants\*.cip`, not double-nested | verified on disk |
+| A second install **backs up** the previous backups instead of clobbering | dated `.backup-*` sibling created, sentinel file preserved byte-for-byte |
+| Missing revert files → skips gracefully, no throw, no empty folder | verified |
+| `-WhatIf` cannot reach either removal call | every destructive call sits inside the `else` of the dry-run guard |
+| `-RemoveFolder` refuses anything not named `RemoteAccessToolBlocker` | 5 path shapes tested, including `…\RemoteAccessToolBlockerXYZ` and a nested subfolder |
+| The installed copy is **self-sufficient** | its guide, README, 32 variants and `$PSScriptRoot`-relative paths all resolve with no kit present |
+
+Three real defects were found by running this rather than reading it: the kit layout was never detected (the
+resolver looked for a *folder* named `revert`, which a release ZIP does not have), the ESET guide never copied,
+and the policies landed double-nested because `-LiteralPath` does not expand a `*` glob — leaving an empty folder
+and no working `policy\variants\`.
 
 ### Known noise, not a defect
 
