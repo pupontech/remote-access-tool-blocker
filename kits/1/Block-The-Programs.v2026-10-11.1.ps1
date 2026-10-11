@@ -1,45 +1,34 @@
 <#
 .SYNOPSIS
-  One-window front end: BLOCK (do) / UNDO remote-access scam tools on this PC. Launched by START-HERE.bat (elevated).
+  Program 1 - block the remote-access scam PROGRAMS on this PC with Windows App Control.
+  Launched by Block-The-Programs.bat (elevated). No antivirus needed, no ESET involved.
 
 .DESCRIPTION
-  BLOCK  1. Windows App Control: installs policy\RmmBlock-Enforce.cip (builds it first if missing and this PC can)
+  BLOCK   Windows App Control: installs policy\RmmBlock-Enforce.cip (builds it first if missing and this PC can)
             -> AnyDesk, TeamViewer, ScreenConnect ... can't start, even renamed / from email / Downloads / USB.
-         2. Builds the ESET website block list, copies it to the clipboard, opens ESET + the paste guide
-            (the paste into ESET is the only manual step).
-  UNDO   Removes the App Control policy (restart to finish) and opens ESET + the guide's UNDO section
-         for taking the website list back out.
-  TEST   Installs the policy in audit mode (logs only, blocks nothing).
+  UNDO    Removes the App Control policy (restart to finish).
+  TEST    Installs the policy in audit mode (logs only, blocks nothing).
   Checkboxes: TeamViewer / AnyDesk / Splashtop / RustDesk can each be blocked or allowed (default: block TeamViewer,
-  AnyDesk + RustDesk, allow Splashtop) - in App Control AND in the ESET website list. Ticked on open = what is installed now. Change them, then press BLOCK (or Test mode) to apply.
+  AnyDesk + RustDesk, allow Splashtop). Ticked on open = what is installed now.
   Every action is logged in the window and in %ProgramData%\RemoteAccessToolBlocker\RmmAppControl.log (via Install-RmmAppControl).
+
+  This is the PROGRAM half of the kit. The ESET website list is a separate program - folder "2". Neither needs the
+  other; run whichever ones you want.
 #>
 [CmdletBinding()]
 param()
 
 $ErrorActionPreference = 'Stop'
-$ScriptVersion = '2026-10-11.3'
+$ScriptVersion = '2026-10-11.1'
 $PolicyGuid = '{2D13BFB7-4304-4847-9CDD-37820D3EE9B7}'   # must match Build-/Install-RmmAppControl
 $bare = $PolicyGuid.Trim('{}').ToLowerInvariant()
 $Here = $PSScriptRoot
-# Where the generated ESET import file goes. Resolved defensively: this line runs BEFORE the
-# window is built, so an unguarded Join-Path here kills the whole script (no window at all)
-# on any host where USERPROFILE is unset.
-if ($env:USERPROFILE) {
-    $UrlOut = Join-Path $env:USERPROFILE 'LOLRMM-UrlList\latest'
-} else {
-    $UrlOut = Join-Path $Here 'LOLRMM-UrlList\latest'
-}
-# The file the ESET import step needs. Shown to the operator so the list can always be found
-# even when the clipboard does not cooperate.
-$UrlListFile = Join-Path $UrlOut 'eset-blocked-urls.txt'
 
 # ------------------------------------------------------------------ parts
-# Repo layout (see README "Repository layout"):
-#   kits/full/         this window + START-HERE.bat
-#   kits/windows-only/ the same window without the ESET steps
+# Repro layout (see README "Repository layout"):
+#   kits/1/            this window + Block-The-Programs.bat  (the program blocker)
+#   kits/2/            the ESET website list program
 #   src/appcontrol/    Build- / Install- / Run-RmmAppControl   (ONE shared copy)
-#   src/eset/          Get-LolrmmUrlList / Get-LolrmmHipsList
 #   policy/            the prebuilt .cip / .xml policies (shared, at the repo root)
 # Running the kit from a built release ZIP (scripts copied side by side) falls back to
 # the local folder, so an extracted kit still works standalone.
@@ -50,16 +39,14 @@ function Resolve-Parts {
     param([string]$Here = $ScriptRootHere)
     $out = @{
         AppControl = $here
-        Eset       = $here
         Policy     = (Join-Path $here 'policy')
         Standalone = $true
     }
+    # repo layout: this file is kits/1/, so the repo root is two levels up
     $root = Split-Path (Split-Path $here -Parent) -Parent
     $srcAc = Join-Path $root 'src\appcontrol'
-    $srcEset = Join-Path $root 'src\eset'
     $pol = Join-Path $root 'policy'
     if (Test-Path -LiteralPath $srcAc) { $out.AppControl = $srcAc; $out.Standalone = $false }
-    if (Test-Path -LiteralPath $srcEset) { $out.Eset = $srcEset }
     if (Test-Path -LiteralPath $pol) { $out.Policy = $pol }
     return $out
 }
@@ -78,14 +65,14 @@ $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIden
 
 # ---------------------------------------------------------------- window
 $form = New-Object Windows.Forms.Form
-$form.Text = "Block remote-access scam tools  (v$ScriptVersion)"
+$form.Text = "1 - Block the remote-access PROGRAMS  (v$ScriptVersion)"
 $form.Size = New-Object Drawing.Size(640, 610)
 $form.StartPosition = 'CenterScreen'
 $form.Font = New-Object Drawing.Font('Segoe UI', 10)
 $form.MinimumSize = $form.Size
 
 $title = New-Object Windows.Forms.Label
-$title.Text = 'Stops AnyDesk, TeamViewer, ScreenConnect and ~50 other remote-access tools that scammers use.'
+$title.Text = 'Stops AnyDesk, TeamViewer, ScreenConnect and ~50 other remote-access programs that scammers use.'
 $title.Location = New-Object Drawing.Point(16, 8); $title.Size = New-Object Drawing.Size(600, 36)
 $form.Controls.Add($title)
 
@@ -144,15 +131,8 @@ $form.Controls.Add($log)
 
 $btnLog = New-Object Windows.Forms.Button
 $btnLog.Text = 'Refresh status / show recent blocks'; $btnLog.Location = New-Object Drawing.Point(16, 528)
-$btnLog.Size = New-Object Drawing.Size(280, 30); $btnLog.Anchor = 'Bottom, Left'
+$btnLog.Size = New-Object Drawing.Size(592, 30); $btnLog.Anchor = 'Bottom, Left'
 $form.Controls.Add($btnLog)
-
-# Reopen the folder holding eset-blocked-urls.txt at any time, without rebuilding it.
-# Deliberately not in Busy()'s disable list: opening a folder is harmless during work.
-$btnFolder = New-Object Windows.Forms.Button
-$btnFolder.Text = 'Open the ESET list folder'; $btnFolder.Location = New-Object Drawing.Point(306, 528)
-$btnFolder.Size = New-Object Drawing.Size(280, 30); $btnFolder.Anchor = 'Bottom, Left'
-$form.Controls.Add($btnFolder)
 
 function Say([string]$m, [string]$color = '') {
     # colour is optional: 'Red'/'Yellow'/'Green' for the lines an operator must not miss.
@@ -214,7 +194,7 @@ function Ensure-Policy([string]$mode, [string]$variant) {
     $build = Find-Newest 'Build-RmmAppControl.v*.ps1' $Parts.AppControl
     if (-not $build -or -not (Get-Command ConvertFrom-CIPolicy -ErrorAction SilentlyContinue)) {
         Say 'The block policy is not in the policy folder and this PC cannot build it (needs Windows Pro).'
-        Say 'Build it on a Pro PC (Build-RmmAppControl -IncludeOptional) and copy the policy folder next to START-HERE.'
+        Say 'Build it on a Pro PC (Build-RmmAppControl -IncludeOptional) and copy the policy folder next to this file.'
         return $false
     }
     Say 'Building the block policy from lolrmm.io (first time only, ~1 minute) ...'
@@ -229,111 +209,33 @@ function Install-Policy([string]$mode) {
     if (-not (Ensure-Policy $mode $v)) { return $false }
     return ((Run-Script $inst @('-Mode', $mode, '-Variant', $v)) -eq 0)
 }
-function Open-ListFolder([bool]$selectFile = $false) {
-    # Put the list in front of the operator rather than naming a path they must navigate to.
-    # /select highlights the file itself, so it is one click from ESET's Import dialog.
-    try {
-        if ($selectFile -and (Test-Path -LiteralPath $UrlListFile)) {
-            Start-Process explorer.exe -ArgumentList ('/select,"' + $UrlListFile + '"')
-        } elseif (Test-Path -LiteralPath $UrlOut) {
-            Start-Process explorer.exe -ArgumentList ('"' + $UrlOut + '"')
-        } else {
-            Say ('  (the folder does not exist yet: ' + $UrlOut + ')') 'Yellow'
-        }
-    } catch {
-        Say ('  could not open the folder automatically. It is: ' + $UrlOut) 'Yellow'
-    }
-}
-
-function Open-EsetAndGuide {
-    $egui = Get-ChildItem -Path (Join-Path $env:ProgramFiles 'ESET') -Filter egui.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($egui) { Start-Process -FilePath $egui.FullName } else { Say '  ESET not found - open it from the Start menu.' }
-    $guide = Find-Newest 'HOW-TO-IMPORT.txt' $Parts.Eset
-    if (Test-Path -LiteralPath $guide) { Start-Process notepad.exe -ArgumentList "`"$guide`"" }
-}
 
 # ---------------------------------------------------------------- actions
 $btnDo.Add_Click({
     Busy $true; $log.Clear()
     try {
         Say '=== BLOCK ==='
-        Say '[1/2] Blocking the programs (Windows App Control) ...'
+        Say 'Blocking the programs (Windows App Control) ...'
         $ok = Install-Policy 'Enforce'
         Say $(if ($ok) { '  -> programs blocked.' } else { '  -> FAILED - see the lines above.' })
-
-        Say '[2/2] Building the ESET website block list ...'
-        $urlScript = Find-Newest 'Get-LolrmmUrlList.v*.ps1' $Parts.Eset
-        # the same ticks decide the website list: unticked tools are left out of it, ticked Splashtop goes in
-        $exTools = @('mstsc', 'NVDA'); $allow = @('eset.com')
-        if (-not $chkS.Checked) { $exTools += 'Splashtop'; $allow += 'splashtop.com', 'splashtop.eu' }
-        if (-not $chkT.Checked) { $exTools += 'TeamViewer'; $allow += 'teamviewer.com' }
-        if (-not $chkA.Checked) { $exTools += 'AnyDesk'; $allow += 'anydesk.com' }
-        if (-not $chkR.Checked) { $exTools += 'RustDesk'; $allow += 'rustdesk.com' }
-        Say "  Website list leaves out: $(($exTools | Where-Object { $_ -notin 'mstsc', 'NVDA' }) -join ', ')$(if (-not ($exTools | Where-Object { $_ -notin 'mstsc', 'NVDA' })) { '(nothing)' })"
-        if (-not $urlScript) {
-            Say '  -> the URL list generator was not found next to this window.' 'Red'
-            Say ('     Looked in: ' + $Parts.Eset) 'Yellow'
-        } elseif ((Run-Script $urlScript @('-OutDir', $UrlOut, '-ExcludeTool', ($exTools -join ','), '-AllowDomain', ($allow -join ','))) -ne 0) {
-            Say '  -> the URL list generator failed - see its output above.' 'Red'
-        } elseif (-not (Test-Path -LiteralPath $UrlListFile)) {
-            Say ('  -> the generator ran but produced no file at ' + $UrlListFile) 'Red'
-        } else {
-            $lines = @(Get-Content -LiteralPath $UrlListFile)
-            # ALWAYS tell the operator where the file is. The clipboard can silently fail
-            # (elevated/hidden windows can own a different clipboard), and without this the
-            # list is written to a path nobody was ever told about.
-            Say ''
-            Say ('  IMPORT FILE: ' + $UrlListFile) 'White'
-            Say ('  (' + $lines.Count + ' entries)') 'White'
-
-            $clipOk = $false
-            try {
-                Set-Clipboard -Value $lines -ErrorAction Stop
-                # read it back: Set-Clipboard returns nothing, so verify rather than assume
-                $back = @(Get-Clipboard -ErrorAction Stop)
-                $clipOk = ($back.Count -ge $lines.Count -and $back[0] -eq $lines[0])
-            } catch { $clipOk = $false }
-
-            if ($clipOk) {
-                Say '  -> list copied to the clipboard (verified) and opening ESET ...' 'Green'
-            } else {
-                Say '  -> could NOT copy to the clipboard, so use the file instead:' 'Red'
-                Say '     in ESET choose Import and pick eset-blocked-urls.txt.' 'Yellow'
-            }
-            Say '  Tip: paste it into a NEW list named "RMM scam block (lolrmm)" so UNDO is one click.'
-            # show them the file: the folder opens with the list selected
-            Open-ListFolder $true
-            Open-EsetAndGuide
-            Say ''
-            Say 'LAST STEP (by hand): in ESET press F5 and follow the guide in Notepad -'
-            if ($clipOk) {
-                Say 'click "Enter multiple values" and press Ctrl+V, then OK -> OK.'
-            } else {
-                Say ('click Import and choose: ' + $UrlListFile)
-            }
-            Say ('  [log] ESET import file: ' + $UrlListFile + ' (' + $lines.Count + ' entries, clipboard=' + $clipOk + ')')
-        }
+        if ($ok) { Say 'Existing copies already running keep running - close them. New starts are blocked.' }
     } catch { Say "ERROR: $($_.Exception.Message)" }
     Update-Status; Busy $false
 })
 
 $btnUndo.Add_Click({
-    $r = [Windows.Forms.MessageBox]::Show('Remove the block from this PC?', 'Undo', 'YesNo', 'Question')
+    $r = [Windows.Forms.MessageBox]::Show('Remove the program block from this PC?', 'Undo', 'YesNo', 'Question')
     if ($r -ne 'Yes') { return }
     Busy $true; $log.Clear()
     try {
         Say '=== UNDO ==='
-        Say '[1/2] Removing the program block (Windows App Control) ...'
+        Say 'Removing the program block (Windows App Control) ...'
         $inst = Find-Newest 'Install-RmmAppControl.v*.ps1' $Parts.AppControl
         if ($inst) { [void](Run-Script $inst @('-Mode', 'Remove')) } else { Say '  Install-RmmAppControl.v*.ps1 missing.' }
-        Say '[2/2] Website block: remove it in ESET by hand (opening ESET + the guide, see the UNDO section):'
-        Say '  F5 > Protections > Web access protection > URL list management > Address list > Edit >'
-        Say '  select "RMM scam block (lolrmm)" > Remove > OK > OK.   (One click.)'
-        Say '  If it was pasted into the built-in "List of blocked addresses" instead: Edit it,'
-        Say '  click the first entry, Shift+click the last, Remove > OK > OK.'
-        Open-EsetAndGuide
         Say ''
         Say 'RESTART the PC to finish removing the program block.'
+        Say 'This program only removes the program block. If the website list program (folder "2")'
+        Say 'was also run on this PC, remove its list in your antivirus separately.'
     } catch { Say "ERROR: $($_.Exception.Message)" }
     Update-Status; Busy $false
 })
@@ -348,19 +250,6 @@ $btnTest.Add_Click({
     Update-Status; Busy $false
 })
 
-$btnFolder.Add_Click({
-    Say '=== Open the ESET list folder ==='
-    if (Test-Path -LiteralPath $UrlListFile) {
-        $n = @(Get-Content -LiteralPath $UrlListFile).Count
-        Say ('  ' + $UrlListFile)
-        Say ('  ' + $n + ' entries, ready to import into ESET.')
-        Open-ListFolder $true
-    } else {
-        Say ('  no list built yet. It will be written to ' + $UrlListFile) 'Yellow'
-        Say '  press BLOCK first, then use this button to open the folder.'
-        Open-ListFolder $false
-    }
-})
 $btnLog.Add_Click({
     Busy $true; $log.Clear()
     $inst = Find-Newest 'Install-RmmAppControl.v*.ps1' $Parts.AppControl
@@ -370,11 +259,14 @@ $btnLog.Add_Click({
 })
 
 # ---------------------------------------------------------------- start
-if (-not $isAdmin) { Say 'Not running as administrator - BLOCK / UNDO will fail. Start this from START-HERE.bat.' }
-Say 'BLOCK  = block the programs + build the ESET website list (one paste in ESET at the end).'
-Say 'UNDO   = remove the program block (restart after) + shows how to remove the website list from ESET.'
+if (-not $isAdmin) { Say 'Not running as administrator - BLOCK / UNDO will fail. Start this from Block-The-Programs.bat.' }
+Say 'BLOCK  = block the remote-access PROGRAMS on this PC (no antivirus needed).'
+Say 'UNDO   = remove the program block (restart after).'
 Say 'Test mode = log only, nothing blocked - for trying it out first.'
 Say 'Ticks = TeamViewer / AnyDesk / Splashtop / RustDesk blocked or allowed. Change them, then press BLOCK to apply.'
+Say ''
+Say 'The websites are a separate program: folder "2". Some PCs (Windows Home) cannot build the'
+Say 'policy themselves and use the prebuilt one shipped in the policy folder.'
 Update-Status
 if ($script:InstalledVariant) {
     $chkT.Checked = ($script:InstalledVariant[1] -eq [char]'1')

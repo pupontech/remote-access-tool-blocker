@@ -91,7 +91,8 @@ jobs:
         run: |
           $fail = @()
           $expect = @{
-            'kits/full/START-HERE.bat'                                = 'RmmBlocker.v*.ps1'
+            'kits/1/Block-The-Programs.bat'                           = 'Block-The-Programs.v*.ps1'
+            'kits/2/Block-The-Websites.bat'                           = 'Block-The-Websites.v*.ps1'
             'kits/windows-only/Remote-Tools-Block-Windows.bat'        = 'Remote-Tools-Block-Windows.v*.ps1'
             'src/appcontrol/Run-RmmAppControl.bat'                    = 'Install-RmmAppControl.v*.ps1'
             'src/eset/Run-LolrmmUrlList.bat'                          = 'Get-LolrmmUrlList.v*.ps1'
@@ -180,3 +181,47 @@ jobs:
           $bad = Select-String -Path 'policy/*.xml', 'policy/variants/*.xml' -Pattern $orgName -ErrorAction SilentlyContinue
           if ($bad) { Write-Host "::error::deployment-specific name found in policy XML"; exit 1 }
           Write-Host 'policy inventory OK'
+
+      # The full kit is now two separate programs: folder 1 is the App Control (program) blocker, folder 2 is
+      # the ESET (website) list. They must stay separable - shipping the ESET steps in program 1 (or App Control
+      # in program 2) recreates the one-window-knob problem this split exists to remove.
+      - name: Two-program split contract
+        run: |
+          $fail = @()
+          $p1 = @(Get-ChildItem -Path 'kits/1' -Filter '*.ps1' -File)
+          $p2 = @(Get-ChildItem -Path 'kits/2' -Filter '*.ps1' -File)
+          if ($p1.Count -ne 1) { $fail += "kits/1: expected exactly 1 .ps1, found $($p1.Count)" }
+          if ($p2.Count -ne 1) { $fail += "kits/2: expected exactly 1 .ps1, found $($p2.Count)" }
+
+          # program 1 - the program blocker - must not mention anything ESET
+          foreach ($f in $p1) {
+            $text = Get-Content -Raw $f.FullName
+            foreach ($pat in 'egui\.exe', 'Get-LolrmmUrlList', 'eset-blocked-urls', 'LOLRMM-UrlList',
+                             'URL list management', 'List of blocked addresses', 'set-clipboard',
+                             'potentially unsafe applications', 'HOW-TO-IMPORT') {
+              if ($text -match $pat) { $fail += "$($f.Name): program 1 contains ESET behaviour /$pat/" }
+            }
+            foreach ($need in 'Install-RmmAppControl', 'RmmBlock', 'App Control') {
+              if ($text -notmatch $need) { $fail += "$($f.Name): program 1 lost $need" }
+            }
+          }
+          # program 2 - the ESET website list - must not touch App Control
+          foreach ($f in $p2) {
+            $text = Get-Content -Raw $f.FullName
+            foreach ($pat in 'Install-RmmAppControl', 'Build-RmmAppControl', 'CiTool', 'ConvertFrom-CIPolicy',
+                             'App Control', 'RmmBlock', 'CodeIntegrity') {
+              if ($text -match $pat) { $fail += "$($f.Name): program 2 contains App Control behaviour /$pat/" }
+            }
+            foreach ($need in 'Get-LolrmmUrlList', 'eset-blocked-urls', 'HOW-TO-IMPORT') {
+              if ($text -notmatch $need) { $fail += "$($f.Name): program 2 lost $need" }
+            }
+          }
+          # the launchers must stay separate too: only program 1 elevates
+          $b1 = Get-Content -Raw 'kits/1/Block-The-Programs.bat'
+          $b2 = Get-Content -Raw 'kits/2/Block-The-Websites.bat'
+          if ($b1 -notmatch 'RunAs') { $fail += 'kits/1: launcher does not elevate (program 1 needs admin)' }
+          if ($b2 -match 'RunAs') { $fail += 'kits/2: launcher elevates (the ESET list program must not need admin)' }
+          # the old combined window must be gone from both folders
+          if (Test-Path 'kits/full') { $fail += 'kits/full still exists - the split should have replaced it' }
+          if ($fail.Count -gt 0) { $fail | ForEach-Object { Write-Host "::error::$_" }; exit 1 }
+          Write-Host 'two-program split OK'

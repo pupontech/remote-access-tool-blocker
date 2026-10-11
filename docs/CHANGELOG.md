@@ -4,19 +4,41 @@ All notable changes to this project. Dates are the versioning dates carried in t
 
 ## Unreleased
 
-### Added: an "Open the ESET list folder" button in the full kit
+### Changed: the full kit is now two separate programs, in folders `1` and `2`
 
-The ESET paste is the one step that cannot be automated, and the window only showed the import file's path as text —
-something the operator has to read and then navigate to by hand. The full-kit window now carries a second button
-beside **Refresh status**, **Open the ESET list folder**, which opens Explorer at
-`%USERPROFILE%\LOLRMM-UrlList\latest` with `eset-blocked-urls.txt` already selected, so it is one click from ESET's
-**Import** dialog. Pressed before a list exists it says so and names the path it *will* write, instead of opening
-nothing.
+The full kit was one window doing two unrelated jobs — Windows App Control (the program blocker) and the ESET
+website list — which forced the ESET steps, the ESET guide and the ESET wording onto every deployment, including
+the ones with no ESET at all.
 
-The BLOCK button also opens the folder for you on the clipboard-failure path, since the file is the route that
-always works. Opening a folder is harmless during work, so the button is deliberately not disabled by `Busy()`.
+It is now two independent programs:
 
-Verified by running the real generator the way the window invokes it (`-OutDir` at that exact path): 406 entries,
+| Folder | Program | What it does | Needs |
+|---|---|---|---|
+| **`1\`** | `Block-The-Programs.bat` | Blocks the remote-access **programs** with Windows App Control | Administrator. No antivirus. |
+| **`2\`** | `Block-The-Websites.bat` | Builds the **website** list, copies it, opens ESET + the paste guide | **ESET installed.** No admin. |
+
+- **Neither program needs the other.** Program 1 never mentions ESET; program 2 never touches App Control, needs no
+  administrator rights and cannot alter the machine's protection.
+- Program 1's UNDO no longer walks through ESET removal steps. Program 2 reports the list's entry count in its own
+  status line instead.
+- Each program has its own ticks, so the tools you leave out are left out of that program's job.
+- The Windows-only kit (`remote-tools-block-windows`) is unchanged — it was already App Control only.
+- `kits/full/` is gone; the combined `START-HERE.bat` window no longer exists.
+
+Enforced by a new CI contract: it fails the build if program 1 gains any ESET behaviour, if program 2 gains any App
+Control reference, if either program loses its core, or if program 2's launcher starts requiring elevation.
+
+### Added: an "Open the list folder" button (program 2)
+
+The ESET paste is the one step that cannot be automated, and the program only showed the import file's path as text —
+something the operator has to read and then navigate to by hand. Program 2 now carries **Open the list folder**,
+which opens Explorer at `%USERPROFILE%\LOLRMM-UrlList\latest` with `eset-blocked-urls.txt` already selected, so it is
+one click from ESET's **Import** dialog. Pressed before a list exists it says so and names the path it *will* write,
+instead of opening nothing.
+
+**BUILD** also opens the folder for you on the clipboard-failure path, since the file is the route that always works.
+
+Verified by running the real generator the way the program invokes it (`-OutDir` at that exact path): 406 entries,
 no BOM, `anydesk.com` present, Splashtop excluded — so the file the button selects is the one ESET imports.
 
 ### Fixed: the ESET list did not appear to arrive

@@ -20,8 +20,8 @@ There are three independent protection layers. Use whichever fit the PC you are 
 
 | Layer | What it blocks | How it is applied | How to undo |
 |---|---|---|---|
-| **Windows App Control** (WDAC) deny policy | The *programs*, wherever they are — renamed, email attachment, Downloads, USB | Fully scripted | Scripted (+ restart) |
-| **ESET web filter** ("List of blocked addresses") | The tools' *websites* — download pages and web consoles | Generated list, **pasted by hand** into ESET | By hand in ESET |
+| **Windows App Control** (WDAC) deny policy — **program `1`** | The *programs*, wherever they are — renamed, email attachment, Downloads, USB | Fully scripted | Scripted (+ restart) |
+| **ESET web filter** ("List of blocked addresses") — **program `2`** | The tools' *websites* — download pages and web consoles | Generated list, **pasted by hand** into ESET | By hand in ESET |
 | **ESET "potentially unsafe applications"** | Known remote tools, flagged by ESET itself | One manual toggle | Toggle off |
 
 The App Control layer is the load-bearing one. The ESET layers are optional extras for PCs that run ESET.
@@ -30,23 +30,32 @@ The App Control layer is the load-bearing one. The ESET layers are optional extr
 
 ## Quick start
 
-1. Download the release ZIP for the kit you want:
-   - `remote-tools-block-windows-<version>.zip` — App Control only. No antivirus needed. Start here.
-   - `full-kit-eset-<version>.zip` — the same, plus the ESET website list.
-2. Extract it anywhere on the PC. Keep the folders together — the launcher finds the scripts relative to itself.
-3. Double-click **`Remote-Tools-Block-Windows.bat`** (Windows-only kit) or **`START-HERE.bat`** (full kit) and
-   accept the administrator prompt.
+The full kit is **two separate programs**, in two folders:
+
+| Folder | Program | What it does | Needs |
+|---|---|---|---|
+| **`1\`** | `Block-The-Programs.bat` | Blocks the remote-access **programs** (AnyDesk, TeamViewer, ScreenConnect …) with Windows App Control | Administrator. No antivirus. |
+| **`2\`** | `Block-The-Websites.bat` | Builds the list of the tools' **websites** and opens ESET + the paste guide | **ESET installed.** No admin needed. |
+
+They are independent — run either one, or both. Neither needs the other.
+
+1. Download the release ZIP you want:
+   - `remote-tools-block-windows-<version>.zip` — the program blocker only. No antivirus needed. **Start here.**
+   - `full-kit-eset-<version>.zip` — both programs, as folders `1` and `2`.
+2. Extract it anywhere on the PC. Keep the folders together — the launchers find the scripts relative to themselves.
+3. **Program 1:** open folder **`1`**, double-click **`Block-The-Programs.bat`** and accept the administrator prompt.
 4. Tick or untick **TeamViewer / AnyDesk / Splashtop / RustDesk**. Ticked = blocked.
 5. Press **BLOCK**.
-6. **Full kit only: a technician must then paste the website list into ESET BY HAND** — the tool cannot do it and
-   cannot verify it. See [The ESET paste](#the-eset-paste--must-be-done-by-hand-by-a-technician).
+6. **Program 2 (only if the PC runs ESET):** open folder **`2`**, double-click **`Block-The-Websites.bat`**, press
+   **BUILD**, then **paste the list into ESET BY HAND** — the program cannot do it and cannot verify it.
+   See [The ESET paste](#the-eset-paste--must-be-done-by-hand-by-a-technician).
 
-When the block is applied, the kit also copies a **standalone undo tool** to
+When program 1 applies the block it also copies a **standalone undo tool** to
 `C:\RemoteAccessToolBlocker` on that PC — see [Undoing it later](#undoing-it-later). It is there so the block can
 be reverted later without the original kit, the network, or this repository.
 
-To undo immediately: press **UNDO**, then restart the PC. In the full kit, also take the website list back out of
-ESET — the guide that opens has the two-click steps.
+To undo immediately: **program 1** → press **UNDO**, then restart the PC. **Program 2** → take the website list
+back out of ESET by hand, following the guide.
 
 The status line always shows the current state — **PROTECTED**, **TEST MODE** or **NOT protected** — and what each
 toggle is set to. **Refresh status** lists recent events: `[3077]` means a program was blocked, `[3076]` means one
@@ -64,8 +73,8 @@ toggle is set to. **Refresh status** lists recent events: `[3077]` means a progr
 > not active — the programs are still blocked by Windows App Control, but the tools' download sites and web
 > consoles are not.
 
-**Before you start:** the **BLOCK** button has already blocked the programs, built the list and **copied it to your
-clipboard**. It also prints the **exact path of the import file** in the window, like this:
+**Before you start:** the **BUILD** button in program 2 (`2\Block-The-Websites.bat`) has already built the list and
+**copied it to your clipboard**. It also prints the **exact path of the import file** in the window, like this:
 
 ```
   IMPORT FILE: C:\Users\<you>\LOLRMM-UrlList\latest\eset-blocked-urls.txt
@@ -73,8 +82,8 @@ clipboard**. It also prints the **exact path of the import file** in the window,
   -> list copied to the clipboard (verified) and opening ESET ...
 ```
 
-**If the clipboard does not work** — common when the window is running elevated, since an elevated process can own
-a different clipboard from your own session — the window says so and tells you to use the file instead:
+**If the clipboard does not work** — the program is normally *not* elevated, but if you launched Windows itself
+elevated a different process can own the clipboard — the window says so and tells you to use the file instead:
 
 ```
   -> could NOT copy to the clipboard, so use the file instead:
@@ -85,7 +94,7 @@ The window also opens the folder for you on that path, with the file already sel
 clipboard is faster; the file always works. **The list is never lost — it is always on disk at the path the window
 prints.**
 
-**Lost the folder?** Press **Open the ESET list folder** in the window at any time — it opens
+**Lost the folder?** Press **Open the list folder** in program 2 at any time — it opens
 `%USERPROFILE%\LOLRMM-UrlList\latest` with `eset-blocked-urls.txt` selected, without rebuilding anything.
 
 It takes about a minute from here.
@@ -171,7 +180,7 @@ undoable from ESET's side.
 ## Test before you enforce
 
 Press **Test mode** first. It installs the same policy in **audit** mode: nothing is blocked, but Windows logs
-what would have been. Run the tool you expect to be blocked, then **Refresh status** and confirm you see a `3076`
+what would have been. Run the program you expect to be blocked, then **Refresh status** and confirm you see a `3076`
 for it. Only then press **BLOCK**.
 
 ---
@@ -350,8 +359,9 @@ then restart. That removes the policy this project installed and nothing else.
 ```
 src/appcontrol/    Build- / Install- / Run-RmmAppControl   (ONE shared copy, used by both kits)
 src/eset/          Get-LolrmmUrlList  (website list)  and Get-LolrmmHipsList  (experimental path list)
-kits/full/         START-HERE.bat + RmmBlocker window   (App Control + ESET website list)
-kits/windows-only/ Remote-Tools-Block-Windows.bat + window (App Control only)
+kits/1/            Block-The-Programs.bat + window   (PROGRAM 1: the App Control program blocker)
+kits/2/            Block-The-Websites.bat + window   (PROGRAM 2: the ESET website list)
+kits/windows-only/ Remote-Tools-Block-Windows.bat + window (App Control only, one window)
 revert/            Run-Revert.bat + Revert-RemoteAccessBlock  (standalone undo/restore tool)
 policy/            the prebuilt policies - 32 toggle combinations + signers.csv (generated output)
 docs/              how-it-works, eset-import-guide, testing, CHANGELOG
