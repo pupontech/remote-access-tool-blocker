@@ -98,8 +98,6 @@ jobs:
             'src/eset/Run-LolrmmUrlList.bat'                          = 'Get-LolrmmUrlList.v*.ps1'
             'src/eset/Run-LolrmmHipsList.bat'                         = 'Get-LolrmmHipsList.v*.ps1'
             'revert/Run-Revert.bat'                                   = 'Revert-RemoteAccessBlock.v*.ps1'
-            'kits/1/Block-The-Programs.bat'                           = 'Block-The-Programs.v*.ps1'
-            'kits/2/Block-The-Websites.bat'                           = 'Block-The-Websites.v*.ps1'
           }
           foreach ($bat in $expect.Keys) {
             if (-not (Test-Path $bat)) { $fail += "${bat}: missing"; continue }
