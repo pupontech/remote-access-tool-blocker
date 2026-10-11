@@ -4,6 +4,52 @@ All notable changes to this project. Dates are the versioning dates carried in t
 
 ## Unreleased
 
+### Windows-only kit: its removal tool no longer has the ESET part
+
+The Windows-only kit installs no ESET layer, but the shared revert tool unconditionally opened ESET, printed ESET
+removal steps and shipped the ESET guide — so a Windows-only deployment was told to go un-block something it had
+never blocked. Fixed by generating two variants from one source:
+
+| Kit | Variant installed | Behaviour |
+|---|---|---|
+| Windows-only | `Revert-RemoteAccessBlock-WinOnly.v*.ps1` | App Control removal only. No ESET window, no ESET steps, no guide, and it does not read the `LOLRMM-UrlList` folder at all. |
+| Full (ESET) | `Revert-RemoteAccessBlock.v*.ps1` | Removes the policy and walks through taking the website list back out of ESET. |
+
+- The installer picks the variant the kit ships, and **removes the other variant** if a previous install used it —
+  so a PC moved to Windows-only can never keep an ESET-capable script.
+- The ESET guide is not installed on the Windows-only path; its `docs\` folder is not created at all.
+- Each variant writes a matching `README.txt`, so the instructions on the PC match what that script does.
+- Both variants are generated from one marked-up source (never hand-edited), so they cannot drift.
+
+Verified by running the installed copies: the Windows-only copy completes a full revert with **zero** ESET
+actions (no ESET line in the output, no ESET-named file anywhere in the install, no `docs\`, no `eset-lists\`
+backup), while the full copy still presents the ESET guide and steps. Switching kits in both directions leaves
+exactly one variant installed.
+
+### Fixed the dry run — `-WhatIf` did not work
+
+`-WhatIf` was documented in the README, the release notes, the script's own help and the launcher comments, but it
+was **not a parameter at all**: `[CmdletBinding()]` alone does not add it to a script, so the switch failed to
+bind with *"A parameter cannot be found that matches parameter name 'WhatIf'"*. The one guardrail that shows what a
+revert would do without changing anything was unusable.
+
+Making it exist via `SupportsShouldProcess` was tried and rejected: that works, but makes PowerShell intercept every
+`ShouldProcess`-aware cmdlet the script calls (`New-Item`, `Add-Content`, `Set-Content`, …) and emit its own
+framework chatter, burying the dry run the operator is meant to read. `-WhatIf` is now an explicit switch driving
+the same guard — nothing is written when it is set, with readable output.
+
+Three further defects surfaced only once the dry run actually ran:
+
+- **A crash on the dry-run path**: `Say '[dry run] would write a log line to ' $LogFile` does not concatenate — the
+  path bound to `-ForegroundColor` and died with *"Cannot convert value '…\Revert.log' to type System.ConsoleColor"*.
+  Fixed at all three sites by parenthesising the expression.
+- **`$env:USERPROFILE` unguarded** in the ESET-only backup loop, so a host without it died with a bare null-`Path`
+  error. Only the full variant hit it, which is why the Windows-only copy ran clean.
+- **`$env:windir` unguarded**, so the tool died at startup on any host lacking it. It now refuses with a specific
+  message and exit code 9 ("This tool needs Windows") instead of an error naming no useful line.
+
+## 2026.10.11
+
 ### Standalone revert / restore tool (`C:\RemoteAccessToolBlocker`)
 
 - **`revert/` — a self-contained undo tool** (`Run-Revert.bat` + `Revert-RemoteAccessBlock`). Applying a block now

@@ -105,12 +105,41 @@ function Install-RevertTool {
 
     # 2. copy the revert tool + its guide
     $copied = 0
-    foreach ($item in @('Run-Revert.bat', 'Revert-RemoteAccessBlock.v*.ps1')) {
+    # Which revert variant is present decides the whole behaviour of the installed tool:
+    #   Revert-RemoteAccessBlock-WinOnly.v*.ps1  = App Control removal only, never touches ESET
+    #   Revert-RemoteAccessBlock.v*.ps1          = also handles the ESET website list
+    # The Windows-only kit ships ONLY the WinOnly variant, so a PC with no ESET layer is
+    # never told to go un-block something it never blocked.
+    $winOnly = @(Get-ChildItem -Path (Join-Path $revDir 'Revert-RemoteAccessBlock-WinOnly.v*.ps1') -File -ErrorAction SilentlyContinue)
+    $fullRev = @(Get-ChildItem -Path (Join-Path $revDir 'Revert-RemoteAccessBlock.v*.ps1')   -File -ErrorAction SilentlyContinue)
+    $isWinOnly = ($winOnly.Count -gt 0) -and ($fullRev.Count -eq 0)
+    if ($winOnly.Count -eq 0 -and $fullRev.Count -eq 0) {
+        Write-Log "No Revert-RemoteAccessBlock*.ps1 found - skipping the $InstallDir install."
+        return
+    }
+    foreach ($item in @('Run-Revert.bat')) {
         foreach ($f in @(Get-ChildItem -Path (Join-Path $revDir $item) -File -ErrorAction SilentlyContinue)) {
             Copy-Item -LiteralPath $f.FullName -Destination (Join-Path $InstallDir $f.Name) -Force
             $copied++
         }
     }
+    # exactly one variant is copied
+    $chosen = if ($isWinOnly) { $winOnly } else { $fullRev }
+    foreach ($f in $chosen) {
+        Copy-Item -LiteralPath $f.FullName -Destination (Join-Path $InstallDir $f.Name) -Force
+        $copied++
+    }
+    # a previous install of the OTHER variant must not survive: it would still open ESET
+    # on a PC that is now running the Windows-only kit, or vice versa.
+    foreach ($stale in @('Revert-RemoteAccessBlock.v*.ps1', 'Revert-RemoteAccessBlock-WinOnly.v*.ps1')) {
+        foreach ($f in @(Get-ChildItem -Path (Join-Path $InstallDir $stale) -File -ErrorAction SilentlyContinue)) {
+            if ($chosen.Name -notcontains $f.Name) {
+                Remove-Item -LiteralPath $f.FullName -Force
+                Write-Log "Removed the superseded revert variant $($f.Name)"
+            }
+        }
+    }
+    Write-Log ("Installed revert variant: " + $(if ($isWinOnly) { 'Windows-only (no ESET handling)' } else { 'full (handles the ESET website list)' }))
     # the ESET removal guide: revert\docs\ in the repo, revert-docs\ in a release ZIP,
     # or loose beside the scripts. Revert-RemoteAccessBlock.ps1 looks for it at
     # <InstallDir>\docs\eset-remove-guide.txt, so copy its CONTENTS into that folder.
@@ -120,7 +149,9 @@ function Install-RevertTool {
         (Join-Path $srcRoot 'revert-docs'),
         $revDir
     ) | Where-Object { $_ -and (Test-Path -LiteralPath (Join-Path $_ 'eset-remove-guide.txt')) } | Select-Object -First 1
-    if ($guideSrc) {
+    if ($isWinOnly) {
+        Write-Log 'Windows-only variant: not copying the ESET removal guide.'
+    } elseif ($guideSrc) {
         New-Item -ItemType Directory -Force -Path $destDocs | Out-Null
         Copy-Item -LiteralPath (Join-Path $guideSrc 'eset-remove-guide.txt') -Destination $destDocs -Force
         $copied++
@@ -161,23 +192,32 @@ function Install-RevertTool {
     }
 
     # 4. a short pointer file for whoever finds the folder
-    $readme = @(
+    $readme = New-Object System.Collections.Generic.List[string]
+    foreach ($line in @(
         'Remote-access tool block - standalone undo tool',
         '',
         'This folder was installed automatically when the block was applied to this PC.',
-        'It is deliberately kept here so the block can be removed later WITHOUT the original kit:',
+        'It is deliberately kept here so the block can be removed later WITHOUT the original',
+        'kit, the network, or the repository.',
         '',
         '    Run-Revert.bat                 undo the block (asks first, then backs up)',
         '    Run-Revert.bat -WhatIf        dry run - show every step, change nothing',
         '    Run-Revert.bat -Restore       put a previously backed-up block back',
         '',
-        'Backups live in backups\<timestamp>\ and are never deleted automatically.',
-        'The ESET website list can only be removed by hand - ESET does not expose it to scripts -',
-        'so Run-Revert.bat opens ESET and docs\eset-remove-guide.txt for that part.',
-        '',
-        'To remove this folder, use Run-Revert.bat -RemoveFolder (it refuses unless the folder',
-        'is named RemoteAccessToolBlocker).'
-    )
+        'Backups live in backups\<timestamp>\ and are never deleted automatically.'
+    )) { $readme.Add($line) }
+    if ($isWinOnly) {
+        $readme.Add('')
+        $readme.Add('This is the Windows App Control only variant. It does not touch ESET, because')
+        $readme.Add('this deployment has no ESET layer installed by the kit.')
+    } else {
+        $readme.Add('')
+        $readme.Add('The ESET website list can only be removed by hand - ESET does not expose it to')
+        $readme.Add('scripts - so Run-Revert.bat opens ESET and docs\eset-remove-guide.txt for that part.')
+    }
+    $readme.Add('')
+    $readme.Add('To remove this folder, use Run-Revert.bat -RemoveFolder (it refuses unless the folder')
+    $readme.Add('is named RemoteAccessToolBlocker).')
     Set-Content -LiteralPath (Join-Path $InstallDir 'README.txt') -Value $readme -Encoding UTF8
 
     Write-Log "Standalone revert tool installed to $InstallDir ($copied item(s) copied)."

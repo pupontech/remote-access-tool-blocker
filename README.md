@@ -57,9 +57,8 @@ The undo tool is installed on the PC itself, at:
 ```
 C:\RemoteAccessToolBlocker\
   Run-Revert.bat                          <- double-click this
-  Revert-RemoteAccessBlock.v2026-10-11.1.ps1
+  Revert-RemoteAccessBlock-variant.ps1    (see the two variants below)
   README.txt
-  docs\eset-remove-guide.txt
   policy\                                 (the built policies, so it can put the block back)
   backups\                                (created by the first revert)
 ```
@@ -69,23 +68,36 @@ kit, the network, or this repository.** Because that folder is a permanent, scri
 note what it is: it lets anyone with local administrator rights undo the block. That is deliberate — the
 alternative is a PC you cannot un-block without hunting down the original kit.
 
+### Two variants, matching the kit you used
+
+The tool installs the variant that matches the kit, because the Windows-only kit never installs an ESET layer and
+must not hand out instructions for software that isn't there:
+
+| Kit you used | Variant installed | Behaviour |
+|---|---|---|
+| **Windows-only** | `Revert-RemoteAccessBlock-WinOnly.v*.ps1` | App Control removal only. **Never touches ESET** — no ESET window, no ESET steps, no guide, and it does not even read the `LOLRMM-UrlList` folder. |
+| **Full (with ESET)** | `Revert-RemoteAccessBlock.v*.ps1` | Removes the policy *and* walks you through taking the website list back out of ESET. |
+
+Both variants are generated from one source, so they cannot drift. Switching kits on a PC **removes the other
+variant**, so a machine that has moved to Windows-only can never keep an ESET-capable script.
+
 | Command | What it does |
 |---|---|
-| `Run-Revert.bat` | Undo the block. Backs up first, then removes the policy and opens ESET's removal guide. |
+| `Run-Revert.bat` | Undo the block. Backs up first, then removes the policy (and opens the ESET guide on the full variant). |
 | `Run-Revert.bat -WhatIf` | **Dry run** — shows every step and changes nothing. |
 | `Run-Revert.bat -Restore` | Put a previously backed-up block back, with its original toggles. |
 | `Run-Revert.bat -NoPause` | Don't wait for a key press at the end (remote/unattended use). |
 | `Run-Revert.bat -RemoveFolder` | After reverting, also delete the folder and its backups. |
 
 **Revert never destroys the ability to restore.** Before it removes anything it copies the installed policy, its
-toggles and mode, the generated ESET lists and a machine summary into `backups\<timestamp>\`, one dated folder per
-revert, never overwritten. `-Restore` reads those back.
+toggles and mode, the generated ESET lists (full variant only) and a machine summary into `backups\<timestamp>\`,
+one dated folder per revert, never overwritten. `-Restore` reads those back.
 
-**The ESET website list is the one part it cannot do for you.** ESET's URL list is a UI import/paste with no
-scriptable interface, so the tool opens ESET, opens `docs\eset-remove-guide.txt`, and tells you exactly what to
-click. It backs up the generated list first so you can see precisely which entries were yours. If you pasted into
-ESET's own built-in list rather than a list you created, the guide warns you to check it was empty beforehand —
-the removal is not undoable from ESET's side.
+**On the full variant, the ESET website list is the one part it cannot do for you.** ESET's URL list is a UI
+import/paste with no scriptable interface, so the tool backs up the generated list, opens ESET,
+opens `docs\eset-remove-guide.txt`, and tells you exactly what to click. If you pasted into ESET's own built-in
+list rather than a list you created, the guide warns you to check it was empty beforehand — that removal is not
+undoable from ESET's side.
 
 `-WhatIf` is the safe way to see what a revert would do on a live machine.
 

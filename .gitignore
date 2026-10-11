@@ -4,3 +4,7 @@ dist/
 # scratch
 *.tmp
 *.log
+
+# test-harness scratch: the probe copies our tests generate next to the script under test
+_probe-*.ps1
+_chk*.ps1

@@ -27,6 +27,10 @@
 
 .PARAMETER WhatIf
   Show what would happen and change nothing. Recommended first run.
+  This is an explicit switch, NOT the common parameter: with [CmdletBinding()] alone the
+  common -WhatIf does not exist for a script, and enabling SupportsShouldProcess makes
+  PowerShell emit its own "What if:" lines for every cmdlet the script calls, hiding the
+  dry-run output. The explicit switch gives the same guarantee with readable output.
 
 .PARAMETER Restore
   Restore a previously backed-up App Control policy instead of removing it.
@@ -55,9 +59,20 @@
 
 .NOTES
   Log: %ProgramData%\RemoteAccessToolBlocker\Revert.log (append-only, never deleted).
+  This build also handles the ESET website list (as far as a script can) and ships
+  docs\eset-remove-guide.txt.
 #>
+# -WhatIf is declared EXPLICITLY.
+#   [CmdletBinding()] alone does not provide it to a script (the switch fails to bind with
+#   "A parameter cannot be found that matches parameter name 'WhatIf'"), and
+#   SupportsShouldProcess does provide it but then makes PowerShell intercept every
+#   ShouldProcess-aware cmdlet this script calls (New-Item, Add-Content, Set-Content,
+#   Copy-Item, Remove-Item) and print its own framework chatter, drowning the dry run the
+#   operator is meant to READ. An explicit switch keeps the guarantee - nothing is written
+#   when -WhatIf is set - with output we control.
 [CmdletBinding()]
 param(
+    [switch]$WhatIf,
     [switch]$Restore,
     [string]$BackupPath,
     [switch]$RemoveFolder,
@@ -75,13 +90,21 @@ $PolicyName = 'Remote Access Tool Blocker'
 $bare = $PolicyGuid.Trim('{}').ToLowerInvariant()
 $Folder = $PSScriptRoot
 $BackupRoot = Join-Path $Folder 'backups'
-$LogDir = Join-Path $env:ProgramData 'RemoteAccessToolBlocker'
-$LogFile = Join-Path $LogDir 'Revert.log'
+$LogDir = if ($env:ProgramData) { Join-Path $env:ProgramData 'RemoteAccessToolBlocker' } else { $null }
+$LogFile = if ($LogDir) { Join-Path $LogDir 'Revert.log' } else { $null }
+# A missing Windows environment variable must produce a clear, specific error rather than
+# a bare "Cannot bind argument to parameter 'Path' because it is null" at startup.
+if (-not $env:windir) {
+    Write-Host ''
+    Write-Host 'This tool needs Windows: the WINDIR environment variable is not set.' -ForegroundColor Red
+    Write-Host 'It cannot remove an App Control policy on a host without one.' -ForegroundColor Red
+    exit 9
+}
 $ciTool = Join-Path $env:windir 'System32\CiTool.exe'
 $activeDir = Join-Path $env:windir 'System32\CodeIntegrity\CiPolicies\Active'
 $activeFile = Join-Path $activeDir ($PolicyGuid + '.cip')
 
-$dry = [bool]$WhatIfPreference
+$dry = [bool]$WhatIf
 $steps = New-Object System.Collections.Generic.List[string]
 
 # --------------------------------------------------------------------- helpers
@@ -91,6 +114,7 @@ function Say([string]$m, [string]$color = 'Gray') {
 }
 function Write-Log([string]$m) {
     if ($dry) { return }
+    if (-not $LogFile) { return }   # no log location on this host - not a failure
     try {
         if (-not (Test-Path -LiteralPath $LogDir)) { New-Item -ItemType Directory -Force -Path $LogDir | Out-Null }
         Add-Content -Encoding UTF8 -LiteralPath $LogFile -Value ('{0}  {1}' -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $m)
@@ -129,7 +153,7 @@ if ($dry) { Write-Host '  DRY RUN (-WhatIf): nothing will be changed.' -Foregrou
 Write-Host ''
 
 if ($dry) {
-    Say '[dry run] would write a log line to ' $LogFile
+    Say ('[dry run] would write a log line to ' + $LogFile)
 } else {
     Write-Log ('=== v{0}  {1}  whatif={2}  admin={3}' -f $ScriptVersion, $(if ($Restore) { 'RESTORE' } else { 'REVERT' }), $dry, (Test-Admin))
 }
@@ -281,8 +305,13 @@ if ($installed) {
         Say '  policy file not found on disk - nothing to save (the backup will record the state only)' 'Yellow'
     }
 }
-# kit leftovers: generated ESET lists + review CSVs
-$listRoots = @((Join-Path $env:USERPROFILE 'LOLRMM-UrlList'), (Join-Path $env:USERPROFILE 'LOLRMM-HipsList'))
+# ESET-only artifacts: the generated URL/HIPS lists our ESET generator leaves behind.
+# The Windows-only build has no ESET layer, so it does not read or touch this folder at all.
+$listRoots = if ($env:USERPROFILE) {
+    @((Join-Path $env:USERPROFILE 'LOLRMM-UrlList'), (Join-Path $env:USERPROFILE 'LOLRMM-HipsList'))
+} else {
+    @()   # no USERPROFILE on this host: nothing to look for (Join-Path $null throws)
+}
 foreach ($r in $listRoots) {
     if (Test-Path -LiteralPath $r) {
         $files = @(Get-ChildItem -LiteralPath $r -Recurse -File -ErrorAction SilentlyContinue |
@@ -324,8 +353,8 @@ Write-Host ''
 # ---- 2. remove the policy
 Write-Host '--- 2. Removing the Windows App Control policy ---' -ForegroundColor Cyan
 if ($dry) {
-    Say '  [dry run] would run: CiTool --remove-policy ' + $PolicyGuid
-    Say '  [dry run] would delete ' + $activeFile + ' if present'
+    Say ('  [dry run] would run: CiTool --remove-policy ' + $PolicyGuid)
+    Say ('  [dry run] would delete ' + $activeFile + ' if present')
     Say '  [dry run] no policy was changed.'
 } else {
     if (Test-Path -LiteralPath $ciTool) {
@@ -380,6 +409,7 @@ if ($dry) {
     Say '  The block has been reverted. RESTART the PC to fully unload the policy.' 'Green'
     if (-not (Test-Path -LiteralPath $bdir)) { Say '  (no backup folder was created - nothing was installed to back up)' 'Yellow' }
     Say '  To put the block back:  Run-Revert.bat -Restore' 'White'
+    Say '  Then re-add the ESET website list by hand (docs\eset-remove-guide.txt).' 'White'
 }
 Say ("  Log: " + $LogFile)
 

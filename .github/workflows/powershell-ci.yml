@@ -118,6 +118,45 @@ jobs:
           if ($fail.Count -gt 0) { $fail | ForEach-Object { Write-Host "::error::$_" }; exit 1 }
           Write-Host 'launcher contract OK'
 
+      # The Windows-only kit must never contain the ESET-capable revert script or the ESET
+      # guide, and the full kit must carry exactly one variant of each kind. Shipping the
+      # ESET script to a Windows-only deployment tells the operator to un-block something
+      # that was never blocked.
+      - name: Revert-variant allocation contract
+        run: |
+          $fail = @()
+          $rev = @(Get-ChildItem -Path 'revert' -Filter '*.ps1' -File)
+          $winOnly = @($rev | Where-Object { $_.Name -match '-WinOnly\.v' })
+          $full    = @($rev | Where-Object { $_.Name -match 'Revert-RemoteAccessBlock\.v' })
+          Write-Host "revert variants: $($winOnly.Count) WinOnly, $($full.Count) full"
+          if ($winOnly.Count -ne 1) { $fail += "expected exactly 1 WinOnly variant, found $($winOnly.Count)" }
+          if ($full.Count -ne 1)    { $fail += "expected exactly 1 full variant, found $($full.Count)" }
+
+          # the WinOnly variant must not reference any ESET behaviour
+          foreach ($f in $winOnly) {
+            $text = Get-Content -Raw $f.FullName
+            foreach ($pat in 'egui\.exe', 'eset-remove-guide', 'LOLRMM-UrlList', 'LOLRMM-HipsList',
+                             'URL list management', 'List of blocked addresses',
+                             'potentially unsafe applications', 'eset-lists') {
+              if ($text -match $pat) { $fail += "$($f.Name): contains ESET behaviour /$pat/" }
+            }
+            # and it must still have a working dry run
+            if ($text -notmatch '\[switch\]\$WhatIf') { $fail += "$($f.Name): no explicit -WhatIf switch" }
+          }
+          # the full variant must still carry the ESET handling and the dry run
+          foreach ($f in $full) {
+            $text = Get-Content -Raw $f.FullName
+            if ($text -notmatch 'eset-remove-guide') { $fail += "$($f.Name): lost the ESET guide handling" }
+            if ($text -notmatch '\[switch\]\$WhatIf') { $fail += "$($f.Name): no explicit -WhatIf switch" }
+          }
+          # no generated variant may keep its region markers
+          foreach ($f in $rev) {
+            $text = Get-Content -Raw $f.FullName
+            if ($text -match '#region eset') { $fail += "$($f.Name): leftover generator marker" }
+          }
+          if ($fail.Count -gt 0) { $fail | ForEach-Object { Write-Host "::error::$_" }; exit 1 }
+          Write-Host 'revert-variant allocation OK'
+
       # policy/ is generated output; a malformed policy would fail at install time
       # on the user's PC, which is the worst place to find out.
       - name: Policy inventory check
