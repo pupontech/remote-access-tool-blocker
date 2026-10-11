@@ -207,6 +207,17 @@ $btnDo.Add_Click({
                 Say '     in ESET choose Import and pick eset-blocked-urls.txt.' 'Yellow'
             }
             Say '  Tip: paste it into a NEW list named "RMM scam block (lolrmm)" so UNDO is one click.'
+            # Install the ESET-aware undo tool now that this PC actually has an ESET layer. Program 1
+            # installs its own (App Control only) undo tool; this one adds the ESET removal steps.
+            $instEset = Find-Newest 'Install-ESET-Revert.v*.ps1' $Parts.Eset
+            if ($instEset) {
+                Say ''
+                Say '  Installing the undo tool (removes the list from ESET later) ...'
+                [void](Run-Script $instEset @())
+            } else {
+                Say '  (the undo-tool installer Install-ESET-Revert.v*.ps1 was not found - the list can still be' 'Yellow'
+                Say '   removed by hand in ESET; run this program again from the full kit to install the tool.)' 'Yellow'
+            }
             Open-ListFolder $true
             Open-EsetAndGuide
             Say ''

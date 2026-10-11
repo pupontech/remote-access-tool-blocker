@@ -4,6 +4,31 @@ All notable changes to this project. Dates are the versioning dates carried in t
 
 ## Unreleased
 
+### Fixed: program 1 no longer hands out ESET removal steps
+
+The split exposed a real defect. Program 1 shipped the *shared* revert tool, and `Install-RmmAppControl` installs
+the ESET-aware variant whenever it is present — so a PC that has **no antivirus at all** still got
+`docs\eset-remove-guide.txt` copied into `C:\RemoteAccessToolBlocker`. That is precisely the bug already fixed once
+for the Windows-only kit ("a Windows-only deployment was told to go un-block something it had never blocked"), on
+a new path.
+
+The undo tool is now split along the same line as the programs:
+
+- **Program 1** ships and installs the **ESET-free** variant (`…-WinOnly`). No ESET guide, no ESET steps.
+- **Program 2** ships `revert/Install-ESET-Revert.v*.ps1`, which installs the **ESET-aware** variant and the guide
+  when it builds a list — the only moment an ESET layer actually exists. It removes the ESET-free copy at the same
+  time, so exactly one variant is ever present.
+
+Verified by running it, not reading it: program 1's installer resolves to the WinOnly variant (winOnly=1, full=0)
+and program 2's to the full one (winOnly=0, full=1) against the **extracted release ZIP**; installing program 2
+over a folder holding the WinOnly variant removes that copy and leaves the full one plus `docs\eset-remove-guide.txt`.
+The switch-over was run for real against a synthetic install directory.
+
+Two defects were found that way. `Install-ESET-Revert` crashed writing its `README.txt` — `$readme = @()` is a
+fixed-size array, so `.Add()` threw *"Collection was of a fixed size"*; it now uses a generic `List[string]`, the
+same pattern the other installer already used. And the whole layout is now produced by
+`build/build-release.sh`, which CI runs and asserts on the real ZIP, so the mapping cannot drift from the docs.
+
 ### Changed: the full kit is now two separate programs, in folders `1` and `2`
 
 The full kit was one window doing two unrelated jobs — Windows App Control (the program blocker) and the ESET

@@ -128,34 +128,49 @@ entries to remove if a client really uses Quick Assist or Chrome Remote Desktop:
 
 ### Undoing it later
 
-The undo tool is installed on the PC itself, at:
+**Program 1** installs the undo tool to `C:\RemoteAccessToolBlocker` on the PC when it applies the block, so the
+block can be removed later without the original kit, the network, or this repository. It installs the **ESET-free**
+variant — program 1 blocks only programs, so it must never hand out ESET removal steps.
 
 ```
 C:\RemoteAccessToolBlocker\
   Run-Revert.bat                          <- double-click this
-  Revert-RemoteAccessBlock-variant.ps1    (see the two variants below)
+  Revert-RemoteAccessBlock-WinOnly.ps1    (App Control removal only, ESET-free)
   README.txt
   policy\                                 (the built policies, so it can put the block back)
   backups\                                (created by the first revert)
 ```
 
-It is placed there automatically when a block is applied, so **the block can be removed later without the original
-kit, the network, or this repository.** Because that folder is a permanent, scriptable tool sitting on the machine,
-note what it is: it lets anyone with local administrator rights undo the block. That is deliberate — the
-alternative is a PC you cannot un-block without hunting down the original kit.
+**Program 2** installs the **ESET-aware** variant to the same folder when it builds a list — that is what adds the
+ESET removal steps and the guide:
 
-### Two variants, matching the kit you used
+```
+C:\RemoteAccessToolBlocker\
+  Revert-RemoteAccessBlock.ps1            (also handles the ESET website list)
+  docs\eset-remove-guide.txt
+  README.txt
+```
 
-The tool installs the variant that matches the kit, because the Windows-only kit never installs an ESET layer and
-must not hand out instructions for software that isn't there:
+Whichever program ran last owns the variant: program 2 **removes** the ESET-free copy when it installs the full one,
+so exactly one variant is ever present and the tool always matches what was actually blocked on the PC. A PC that
+only ever ran program 1 therefore never sees an ESET step.
 
-| Kit you used | Variant installed | Behaviour |
+Because that folder is a permanent, scriptable tool sitting on the machine, note what it is: it lets anyone with
+local administrator rights undo the block. That is deliberate — the alternative is a PC you cannot un-block without
+hunting down the original kit.
+
+### Two variants, matching what actually ran on the PC
+
+The variant installed is chosen by which program put it there, because a PC that only ran program 1 (or the
+Windows-only kit) has no ESET layer and must never be told to go un-block something that was never blocked:
+
+| Program used | Variant installed | Behaviour |
 |---|---|---|
-| **Windows-only** | `Revert-RemoteAccessBlock-WinOnly.v*.ps1` | App Control removal only. **Never touches ESET** — no ESET window, no ESET steps, no guide, and it does not even read the `LOLRMM-UrlList` folder. |
-| **Full (with ESET)** | `Revert-RemoteAccessBlock.v*.ps1` | Removes the policy *and* walks you through taking the website list back out of ESET. |
+| **Program 1** (and the **Windows-only** kit) | `Revert-RemoteAccessBlock-WinOnly.v*.ps1` | App Control removal only. **Never touches ESET** — no ESET window, no ESET steps, no guide, and it does not even read the `LOLRMM-UrlList` folder. |
+| **Program 2** (the website list) | `Revert-RemoteAccessBlock.v*.ps1` | Removes the policy *and* walks you through taking the website list back out of ESET. |
 
-Both variants are generated from one source, so they cannot drift. Switching kits on a PC **removes the other
-variant**, so a machine that has moved to Windows-only can never keep an ESET-capable script.
+Program 2 **removes** the ESET-free variant when it installs the full one, so exactly one variant is ever present
+and it always matches what was blocked. Both variants are generated from one source, so they cannot drift.
 
 | Command | What it does |
 |---|---|
@@ -309,10 +324,16 @@ reinstall.
 
 ---
 
-## Rebuilding the policy
+## Rebuilding the policy and the release ZIPs
 
 The pre-built policies in `policy/` are committed, so ordinary use needs nothing else. Rebuild when you want to
 pick up new tools or refreshed certificates.
+
+To rebuild the **release ZIPs** (both kits, with the `1\`/`2\` split asserted on the result):
+
+```bash
+./build/build-release.sh          # writes dist/*.zip + .sha256
+```
 
 Requires **Windows 10/11 Pro or Enterprise** (the ConfigCI module) and PowerShell 5.1:
 
@@ -362,8 +383,9 @@ src/eset/          Get-LolrmmUrlList  (website list)  and Get-LolrmmHipsList  (e
 kits/1/            Block-The-Programs.bat + window   (PROGRAM 1: the App Control program blocker)
 kits/2/            Block-The-Websites.bat + window   (PROGRAM 2: the ESET website list)
 kits/windows-only/ Remote-Tools-Block-Windows.bat + window (App Control only, one window)
-revert/            Run-Revert.bat + Revert-RemoteAccessBlock  (standalone undo/restore tool)
+revert/            Run-Revert.bat + Revert-RemoteAccessBlock (both variants) + Install-ESET-Revert
 policy/            the prebuilt policies - 32 toggle combinations + signers.csv (generated output)
+build/             build-release.sh - builds BOTH release ZIPs and asserts the 1\/2\ split on them
 docs/              how-it-works, eset-import-guide, testing, CHANGELOG
 archive/           the original ESET HIPS prototype, kept for history
 ```
