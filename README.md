@@ -1,5 +1,5 @@
 
-#vibe coded use at your own risk
+# vibe coded use at your own risk
 # Remote-access tool blocker (Windows App Control + optional ESET list)
 
 Blocks the **legitimate remote-support tools that tech-support scammers abuse** — AnyDesk, TeamViewer,
