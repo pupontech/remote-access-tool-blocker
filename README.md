@@ -77,12 +77,16 @@ clipboard**. It also prints the **exact path of the import file** in the window,
 a different clipboard from your own session — the window says so and tells you to use the file instead:
 
 ```
-  -> could NOT copy to the clipboard. Use the IMPORT FILE above:
-     in ESET choose Import and pick that eset-blocked-urls.txt file.
+  -> could NOT copy to the clipboard, so use the file instead:
+     in ESET choose Import and pick eset-blocked-urls.txt.
 ```
 
-Either route works. The clipboard is faster; the file always works. **The list is never lost — it is always on disk
-at the path the window prints.**
+The window also opens the folder for you on that path, with the file already selected. Either route works. The
+clipboard is faster; the file always works. **The list is never lost — it is always on disk at the path the window
+prints.**
+
+**Lost the folder?** Press **Open the ESET list folder** in the window at any time — it opens
+`%USERPROFILE%\LOLRMM-UrlList\latest` with `eset-blocked-urls.txt` selected, without rebuilding anything.
 
 It takes about a minute from here.
 

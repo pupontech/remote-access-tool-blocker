@@ -4,6 +4,21 @@ All notable changes to this project. Dates are the versioning dates carried in t
 
 ## Unreleased
 
+### Added: an "Open the ESET list folder" button in the full kit
+
+The ESET paste is the one step that cannot be automated, and the window only showed the import file's path as text —
+something the operator has to read and then navigate to by hand. The full-kit window now carries a second button
+beside **Refresh status**, **Open the ESET list folder**, which opens Explorer at
+`%USERPROFILE%\LOLRMM-UrlList\latest` with `eset-blocked-urls.txt` already selected, so it is one click from ESET's
+**Import** dialog. Pressed before a list exists it says so and names the path it *will* write, instead of opening
+nothing.
+
+The BLOCK button also opens the folder for you on the clipboard-failure path, since the file is the route that
+always works. Opening a folder is harmless during work, so the button is deliberately not disabled by `Busy()`.
+
+Verified by running the real generator the way the window invokes it (`-OutDir` at that exact path): 406 entries,
+no BOM, `anydesk.com` present, Splashtop excluded — so the file the button selects is the one ESET imports.
+
 ### Fixed: the ESET list did not appear to arrive
 
 Two independent defects, either of which alone makes the list look like it vanished.

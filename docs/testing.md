@@ -102,9 +102,11 @@ Windows 11 Pro build 26200, ESET Security 19.2.10, with the earlier three-toggle
 - **The v.3 policies with the RustDesk toggle.** The rules match the real RustDesk installer's certificate (leaf
   and publisher), and all 32 policies compiled and round-tripped through `ConvertFrom-CIPolicy`.
   **A RustDesk block has not been observed.**
-- **The window buttons** (BLOCK / UNDO / Test mode) in both windows. Each window opens, but the buttons need
-  administrator rights and were not clicked by an automated test. They call the same install script that *was*
-  verified end to end.
+- **The window buttons** (BLOCK / UNDO / Test mode / Open the ESET list folder) in both windows. Each window opens,
+  but the buttons need administrator rights and were not clicked by an automated test. They call the same install
+  script that *was* verified end to end. The folder button's contract — that the file it selects exists at exactly
+  the path it announces — **was** verified by running the real generator with `-OutDir` set to that path (406
+  entries, no BOM).
 - **Windows Home.** App Control on Home editions is claimed by third parties but is **untested here**. Run audit
   mode on one Home PC first.
 - **The ESET "Add list" button** — the button used to create a separate address list is documented by ESET but was

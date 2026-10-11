@@ -147,6 +147,13 @@ $btnLog.Text = 'Refresh status / show recent blocks'; $btnLog.Location = New-Obj
 $btnLog.Size = New-Object Drawing.Size(280, 30); $btnLog.Anchor = 'Bottom, Left'
 $form.Controls.Add($btnLog)
 
+# Reopen the folder holding eset-blocked-urls.txt at any time, without rebuilding it.
+# Deliberately not in Busy()'s disable list: opening a folder is harmless during work.
+$btnFolder = New-Object Windows.Forms.Button
+$btnFolder.Text = 'Open the ESET list folder'; $btnFolder.Location = New-Object Drawing.Point(306, 528)
+$btnFolder.Size = New-Object Drawing.Size(280, 30); $btnFolder.Anchor = 'Bottom, Left'
+$form.Controls.Add($btnFolder)
+
 function Say([string]$m, [string]$color = '') {
     # colour is optional: 'Red'/'Yellow'/'Green' for the lines an operator must not miss.
     # The on-screen box is this window's output surface, so every line lands there too.
@@ -222,6 +229,22 @@ function Install-Policy([string]$mode) {
     if (-not (Ensure-Policy $mode $v)) { return $false }
     return ((Run-Script $inst @('-Mode', $mode, '-Variant', $v)) -eq 0)
 }
+function Open-ListFolder([bool]$selectFile = $false) {
+    # Put the list in front of the operator rather than naming a path they must navigate to.
+    # /select highlights the file itself, so it is one click from ESET's Import dialog.
+    try {
+        if ($selectFile -and (Test-Path -LiteralPath $UrlListFile)) {
+            Start-Process explorer.exe -ArgumentList ('/select,"' + $UrlListFile + '"')
+        } elseif (Test-Path -LiteralPath $UrlOut) {
+            Start-Process explorer.exe -ArgumentList ('"' + $UrlOut + '"')
+        } else {
+            Say ('  (the folder does not exist yet: ' + $UrlOut + ')') 'Yellow'
+        }
+    } catch {
+        Say ('  could not open the folder automatically. It is: ' + $UrlOut) 'Yellow'
+    }
+}
+
 function Open-EsetAndGuide {
     $egui = Get-ChildItem -Path (Join-Path $env:ProgramFiles 'ESET') -Filter egui.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($egui) { Start-Process -FilePath $egui.FullName } else { Say '  ESET not found - open it from the Start menu.' }
@@ -274,10 +297,12 @@ $btnDo.Add_Click({
             if ($clipOk) {
                 Say '  -> list copied to the clipboard (verified) and opening ESET ...' 'Green'
             } else {
-                Say '  -> could NOT copy to the clipboard. Use the IMPORT FILE above:' 'Red'
-                Say '     in ESET choose Import and pick that eset-blocked-urls.txt file.' 'Yellow'
+                Say '  -> could NOT copy to the clipboard, so use the file instead:' 'Red'
+                Say '     in ESET choose Import and pick eset-blocked-urls.txt.' 'Yellow'
             }
             Say '  Tip: paste it into a NEW list named "RMM scam block (lolrmm)" so UNDO is one click.'
+            # show them the file: the folder opens with the list selected
+            Open-ListFolder $true
             Open-EsetAndGuide
             Say ''
             Say 'LAST STEP (by hand): in ESET press F5 and follow the guide in Notepad -'
@@ -323,6 +348,19 @@ $btnTest.Add_Click({
     Update-Status; Busy $false
 })
 
+$btnFolder.Add_Click({
+    Say '=== Open the ESET list folder ==='
+    if (Test-Path -LiteralPath $UrlListFile) {
+        $n = @(Get-Content -LiteralPath $UrlListFile).Count
+        Say ('  ' + $UrlListFile)
+        Say ('  ' + $n + ' entries, ready to import into ESET.')
+        Open-ListFolder $true
+    } else {
+        Say ('  no list built yet. It will be written to ' + $UrlListFile) 'Yellow'
+        Say '  press BLOCK first, then use this button to open the folder.'
+        Open-ListFolder $false
+    }
+})
 $btnLog.Add_Click({
     Busy $true; $log.Clear()
     $inst = Find-Newest 'Install-RmmAppControl.v*.ps1' $Parts.AppControl
