@@ -1,0 +1,791 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SiPolicy xmlns="urn:schemas-microsoft-com:sipolicy" PolicyType="Base Policy">
+  <VersionEx>1.2610.1113.2659</VersionEx>
+  <PolicyID>{2D13BFB7-4304-4847-9CDD-37820D3EE9B7}</PolicyID>
+  <BasePolicyID>{2D13BFB7-4304-4847-9CDD-37820D3EE9B7}</BasePolicyID>
+  <PlatformID>{2E07F7E4-194C-4D20-B7C9-6F44A6C5A234}</PlatformID>
+  <Rules>
+    <Rule>
+      <Option>Enabled:Unsigned System Integrity Policy</Option>
+    </Rule>
+    <Rule>
+      <Option>Enabled:Advanced Boot Options Menu</Option>
+    </Rule>
+    <Rule>
+      <Option>Enabled:UMCI</Option>
+    </Rule>
+    <Rule>
+      <Option>Enabled:Update Policy No Reboot</Option>
+    </Rule>
+    <Rule>
+      <Option>Enabled:Inherit Default Policy</Option>
+    </Rule>
+    <Rule>
+      <Option>Enabled:Revoked Expired As Unsigned</Option>
+    </Rule>
+    <Rule>
+      <Option>Disabled:Script Enforcement</Option>
+    </Rule>
+    <Rule>
+      <Option>Enabled:Audit Mode</Option>
+    </Rule>
+  </Rules>
+  <!--EKUS-->
+  <EKUs />
+  <!--File Rules-->
+  <FileRules>
+    <Allow ID="ID_ALLOW_A_1" FileName="*" />
+    <Allow ID="ID_ALLOW_A_2" FileName="*" />
+    <Deny ID="ID_DENY_RMM_F_1" FriendlyName="rustdesk.exe" FileName="rustdesk.exe" MinimumFileVersion="0.0.0.0" MaximumFileVersion="65535.65535.65535.65535" />
+  </FileRules>
+  <!--Signers-->
+  <Signers>
+    <Signer ID="ID_SIGNER_RMM_1" Name="Action1 Corporation (leaf)">
+      <CertRoot Type="TBS" Value="5AE2DDF6B35FED6B653E5C1BC3530F8A965D3FE7F21A0A492FAE0811C96ACFF0" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_2" Name="Action1 Corporation (publisher)">
+      <CertRoot Type="TBS" Value="F55821C081B58E86EAA202923E715E1524C422C7BE0469B13A9E7A319E50D70CB5B67E864273029A79250F9DC3203CBD" />
+      <CertPublisher Value="Action1 Corporation" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_3" Name="Advanced Technologies LLC (leaf)">
+      <CertRoot Type="TBS" Value="C05275402BB70FB49E6F8A18B68D324B29F2CFE1F669E2D712C8E1E62BBAA8E4" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_4" Name="Advanced Technologies LLC (publisher)">
+      <CertRoot Type="TBS" Value="D9C7DB0B704F07089440C56E69A0F31D730EDF77CFBF7514630E8B5390A270FE" />
+      <CertPublisher Value="Advanced Technologies LLC" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_5" Name="Aeroadmin LLC (leaf)">
+      <CertRoot Type="TBS" Value="B07A40D57305BE553F0C045095C69BBB9FE609BC8ED6E907AF11F240BD5B7C52" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_6" Name="Aeroadmin LLC (publisher)">
+      <CertRoot Type="TBS" Value="D9C7DB0B704F07089440C56E69A0F31D730EDF77CFBF7514630E8B5390A270FE" />
+      <CertPublisher Value="Aeroadmin LLC" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_7" Name="Anyplace Control Software (leaf)">
+      <CertRoot Type="TBS" Value="428EDC9D675B66BF9EAE54B03CF5138F10919C2BCC5BEC4FEBED3701313AA6AE" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_8" Name="Anyplace Control Software (publisher)">
+      <CertRoot Type="TBS" Value="4805A7E23D6C8FF5E149F197B744BCB2346E73F19A48835A2F64129183981109256B75EA371A331746D01FD4E135AB6E" />
+      <CertPublisher Value="Anyplace Control Software" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_9" Name="Atera Networks Ltd (leaf)">
+      <CertRoot Type="TBS" Value="97D2940D1BA0DBAF84280371A267A1BC689DEC0E224010EC7963D9DE45A5BCD1" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_10" Name="Atera Networks Ltd (leaf)">
+      <CertRoot Type="TBS" Value="C81C87870D6F0DD87F6E02E5D6EE09886DE73BECB81B06A3C92626E24F174A3D" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_11" Name="Atera Networks Ltd (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="Atera Networks Ltd" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_12" Name="Begonia Holdings LLC (leaf)">
+      <CertRoot Type="TBS" Value="124A82D873B80FDD7D1646E88FD2E99F0D9A547B9D98798C589019F47F66BA2DF42AF28F7B1D8DD26764E90066D77AE2" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_13" Name="Begonia Holdings LLC (publisher)">
+      <CertRoot Type="TBS" Value="0EEB0F83C55CCAAF275CEC9CAAED00280B6DD9BD8E37BD8A191A5CF77A0E2D1298EDB019E2A1E67E3F7BD4B1C7616DC0" />
+      <CertPublisher Value="Begonia Holdings LLC" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_14" Name="Christopher West (leaf)">
+      <CertRoot Type="TBS" Value="A306499CEC6AF8C46C2F959731D0D41C6090D06C" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_15" Name="Christopher West (leaf)">
+      <CertRoot Type="TBS" Value="EA02531BA6EEAE043DFCDBEAC2A5C520567FC566AB5C2D75AA0DEAD4E2F6414D" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_16" Name="Christopher West (publisher)">
+      <CertRoot Type="TBS" Value="795C721C6A7AC44EA8271474EF1EA73E82BBB0A4DA14251F224872D38DF04B5C" />
+      <CertPublisher Value="Christopher West" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_17" Name="Christopher West (publisher)">
+      <CertRoot Type="TBS" Value="A08F845697C97A9F3EDA8138F159DE7FCEE20B9183F71521DE54C260248B6A81" />
+      <CertPublisher Value="Christopher West" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_18" Name="ConnectWise, Inc. (leaf)">
+      <CertRoot Type="TBS" Value="2536E3C682B73B99B516CDEEE24FCB828C84CBDA003E3C3075CA771717B4CEBA" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_19" Name="ConnectWise, Inc. (publisher)">
+      <CertRoot Type="TBS" Value="15E7050789DF807F3E3174294A01B637A1239F603E42F4B5DB9398EFA9DA9996" />
+      <CertPublisher Value="ConnectWise, Inc." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_20" Name="Connectwise, LLC (leaf)">
+      <CertRoot Type="TBS" Value="46135C0D0BC2714588E2E99AEB2BBC714F972F50D46C4C6D084F9D9CF9E485A4" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_21" Name="ConnectWise, LLC (leaf)">
+      <CertRoot Type="TBS" Value="4A8E7F6F2A88073A4D0C215371B3BE83248229BB66C22F4C163C619317A65A8A" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_22" Name="ConnectWise, LLC (leaf)">
+      <CertRoot Type="TBS" Value="50DAD6A02F0141B36EDDD64AE88219A53C7FF7FC47D2047B18A5EC329B083FAF" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_23" Name="ConnectWise, LLC (leaf)">
+      <CertRoot Type="TBS" Value="54DDF47F8C2DF317E256BEB3A7C0AC62F9D84E1510CCEF5CD961E8CA8EA10A9F" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_24" Name="ConnectWise, LLC (leaf)">
+      <CertRoot Type="TBS" Value="6823B6EC9A39A6DFA49447F73690715B2194FD707003E774F13A33BD3BF536C3" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_25" Name="ConnectWise, LLC (leaf)">
+      <CertRoot Type="TBS" Value="A1AB8075B2509284EF67B9A0D77A55FB7090F21E1BE9C1B16C76A514DB6E823C" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_26" Name="ConnectWise, LLC (leaf)">
+      <CertRoot Type="TBS" Value="A89A5D2D23B877BDBF9ADC3922D993FB38822D8330E848068849D47599A98F23" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_27" Name="ConnectWise, LLC (leaf)">
+      <CertRoot Type="TBS" Value="A9183C38F6658FE9AB270337C8905CA5458A1737ABDD0B891AA9216605C307E7" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_28" Name="ConnectWise, LLC (leaf)">
+      <CertRoot Type="TBS" Value="CD68F6949F7ECF612433BE2F078046576B41E731B0A9ECED01F0D932FE47F796" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_29" Name="ConnectWise, LLC (leaf)">
+      <CertRoot Type="TBS" Value="D21D4D2D6BC1A1DA4A7E7533B4461115F13AF269B93DF53A6BA331B477AE0F0C" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_30" Name="ConnectWise, LLC (leaf)">
+      <CertRoot Type="TBS" Value="E3F75BC74010B197E9C574E415E4F68A783301EE363B26A0099F1C90338F3B43" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_31" Name="ConnectWise, LLC (leaf)">
+      <CertRoot Type="TBS" Value="EE87E0B6968C49806887874C952D0F6C1DAABA50D699FE8C5524103D7A3A82D1" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_32" Name="ConnectWise, LLC (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="ConnectWise, LLC" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_33" Name="Domotz Inc (leaf)">
+      <CertRoot Type="TBS" Value="1F28243E790F8A14833AD151223E08AE287F8938156E2BD2809D91EB1B872EAD" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_34" Name="Domotz Inc (leaf)">
+      <CertRoot Type="TBS" Value="25457BE25A9D546CC3189A234EA5D84FAEC54C46D15B9E04AB08BDFC26AD513E" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_35" Name="Domotz Inc (publisher)">
+      <CertRoot Type="TBS" Value="F55821C081B58E86EAA202923E715E1524C422C7BE0469B13A9E7A319E50D70CB5B67E864273029A79250F9DC3203CBD" />
+      <CertPublisher Value="Domotz Inc" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_36" Name="Domotz Inc (publisher)">
+      <CertRoot Type="TBS" Value="FCD8DD15125F14B84FEC55838806355EC3787407188BAC83C2C0D6C841ADF9AC76EE83ECCC5C9463F1F88FC5295A31EE" />
+      <CertPublisher Value="Domotz Inc" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_37" Name="DOMOTZ INC. (leaf)">
+      <CertRoot Type="TBS" Value="1AC7906726A0C7C9A0D9E43C6FC88FFBBE7BCF97F9A719EDB7EF9D0541EA8DA6" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_38" Name="DOMOTZ INC. (publisher)">
+      <CertRoot Type="TBS" Value="56F431D13FD6F7974905196A6367D252A955C5FE34DB1E48CFA3EB569707809D63DE4A0FF8FEF57BE69C23284D9144EA" />
+      <CertPublisher Value="DOMOTZ INC." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_39" Name="DUC FABULOUS CO.,LTD (leaf)">
+      <CertRoot Type="TBS" Value="8D5708904EE6AA475A0928A7043E0E0D2B0DC31F559A3DF4FA345763831DC70C" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_40" Name="DUC FABULOUS CO.,LTD (leaf)">
+      <CertRoot Type="TBS" Value="A6B2DF8974F52D3EC6E2A2D64B7C96E1F90B413C6EB7BF46D6C786EA753FA1E1" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_41" Name="DUC FABULOUS CO.,LTD (leaf)">
+      <CertRoot Type="TBS" Value="E2DCB900F5DFE58B971D4D4C7056BBB09F7AA6CDCC8DC0C093E19F8F48239159" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_42" Name="DUC FABULOUS CO.,LTD (leaf)">
+      <CertRoot Type="TBS" Value="E745D44D154427FA248F601B5C094ACFF07D4D3AB678D5EDB26899FD9114AD46" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_43" Name="DUC FABULOUS CO.,LTD (publisher)">
+      <CertRoot Type="TBS" Value="20ADC5B59CB532E215F01BA09A9C745898C206555613512FEA7C295CCFD17CED4FE2C5BC3274CA8A270FC68799B8343C" />
+      <CertPublisher Value="DUC FABULOUS CO.,LTD" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_44" Name="DUC FABULOUS CO.,LTD (publisher)">
+      <CertRoot Type="TBS" Value="49B229A10F850DE5B85110A0E0F59C48DD12B116C9AD236A3F16C5BDFBC968D5" />
+      <CertPublisher Value="DUC FABULOUS CO.,LTD" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_45" Name="DUC FABULOUS CO.,LTD (publisher)">
+      <CertRoot Type="TBS" Value="AFD2A93E1B0D868073CF0362891A248C16B93D1F88A732CA55E5EF941E69BB16D544431846D98E792DAE82879205C263" />
+      <CertPublisher Value="DUC FABULOUS CO.,LTD" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_46" Name="DWSNET srl (leaf)">
+      <CertRoot Type="TBS" Value="D78F9AF5FFF911AEE4E2B80EFDE4F097C8A462623DC66A9322CFC178BBE38068A22CB8717BC5449913CBDB91C2A40E0B" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_47" Name="DWSNET srl (publisher)">
+      <CertRoot Type="TBS" Value="0EEB0F83C55CCAAF275CEC9CAAED00280B6DD9BD8E37BD8A191A5CF77A0E2D1298EDB019E2A1E67E3F7BD4B1C7616DC0" />
+      <CertPublisher Value="DWSNET srl" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_48" Name="FastViewer GmbH (leaf)">
+      <CertRoot Type="TBS" Value="5ADD1D07C05E16B75D504C5EB76DFC892888620DF8205D3F23E6068049130510" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_49" Name="FastViewer GmbH (leaf)">
+      <CertRoot Type="TBS" Value="AD3D2D1485CAB1E72DD2A0C7228E9467D5A36E93BB3F17C4699882DA901348E0" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_50" Name="FastViewer GmbH (leaf)">
+      <CertRoot Type="TBS" Value="FF61DC60973A1DB2A6871C7AF1EEAEDE65EEECE92D36675107592266766149D2" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_51" Name="FastViewer GmbH (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="FastViewer GmbH" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_52" Name="FastViewer GmbH (publisher)">
+      <CertRoot Type="TBS" Value="C734685D985B8EA13DB4FC1A6DCD26AA0DDE78B4C3B651EA5D58E32E081B2A41" />
+      <CertPublisher Value="FastViewer GmbH" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_53" Name="FastViewer GmbH (publisher)">
+      <CertRoot Type="TBS" Value="EEC58131DC11CD7F512501B15FDBC6074C603B68CA91F7162D5A042054EDB0CF" />
+      <CertPublisher Value="FastViewer GmbH" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_54" Name="FleetDeck Inc (leaf)">
+      <CertRoot Type="TBS" Value="2B558A81F2AE1CFC91FBC2B16A79BBACE77FA34F140C3418D6CF7DC4502AFCBE" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_55" Name="FleetDeck Inc (leaf)">
+      <CertRoot Type="TBS" Value="67FB7502C5558CAA36C59E6A08ACCB243C2369C7BB3214A9A321F8CEA5DB16E0" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_56" Name="FleetDeck Inc (publisher)">
+      <CertRoot Type="TBS" Value="F55821C081B58E86EAA202923E715E1524C422C7BE0469B13A9E7A319E50D70CB5B67E864273029A79250F9DC3203CBD" />
+      <CertPublisher Value="FleetDeck Inc" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_57" Name="FleetDeck Inc (publisher)">
+      <CertRoot Type="TBS" Value="FCD8DD15125F14B84FEC55838806355EC3787407188BAC83C2C0D6C841ADF9AC76EE83ECCC5C9463F1F88FC5295A31EE" />
+      <CertPublisher Value="FleetDeck Inc" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_58" Name="FLEETDECK INC. (leaf)">
+      <CertRoot Type="TBS" Value="10BA0C15DBB8A3DCC97DA22C8EE7ABA6577CD4733356520890518CE115736DFE" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_59" Name="FLEETDECK INC. (publisher)">
+      <CertRoot Type="TBS" Value="F55821C081B58E86EAA202923E715E1524C422C7BE0469B13A9E7A319E50D70CB5B67E864273029A79250F9DC3203CBD" />
+      <CertPublisher Value="FLEETDECK INC." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_60" Name="GORELO TECH, INC. (leaf)">
+      <CertRoot Type="TBS" Value="E3326768CA2ECABFF891384893510DC98CC23DE0FC05AB4BF6CB4C14CC8E3AA6" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_61" Name="GORELO TECH, INC. (publisher)">
+      <CertRoot Type="TBS" Value="D9C7DB0B704F07089440C56E69A0F31D730EDF77CFBF7514630E8B5390A270FE" />
+      <CertPublisher Value="GORELO TECH, INC." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_62" Name="helpU Inc. (leaf)">
+      <CertRoot Type="TBS" Value="E96573E56BAF7907D7E1AD7C07BB3CE93FABD2F1E89BDE5F04ADEC3EB3AEFA10" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_63" Name="helpU Inc. (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="helpU Inc." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_64" Name="Honcharuk Yuriy (leaf)">
+      <CertRoot Type="TBS" Value="40FC7F598113A7B281219F20971FD40D500C8B75" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_65" Name="Honcharuk Yuriy (publisher)">
+      <CertRoot Type="TBS" Value="EE6C8048E2AA17A6506ECC99D41B1BA6794C3252" />
+      <CertPublisher Value="Honcharuk Yuriy" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_66" Name="hs2n Informationstechnologie GmbH (leaf)">
+      <CertRoot Type="TBS" Value="A74EEE3B868A5749D188DB1A33E35393AD481C824193DCB34475E8E2BA43FC78" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_67" Name="hs2n Informationstechnologie GmbH (publisher)">
+      <CertRoot Type="TBS" Value="AFD2A93E1B0D868073CF0362891A248C16B93D1F88A732CA55E5EF941E69BB16D544431846D98E792DAE82879205C263" />
+      <CertPublisher Value="hs2n Informationstechnologie GmbH" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_68" Name="Instant Housecall (leaf)">
+      <CertRoot Type="TBS" Value="B5C6269F02ABDB9F84F804D88C122DAF157DEA9AC2E408CC358A65AF62A986B5540F99C049AE16A671695031526C48CB" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_69" Name="Instant Housecall (publisher)">
+      <CertRoot Type="TBS" Value="0EEB0F83C55CCAAF275CEC9CAAED00280B6DD9BD8E37BD8A191A5CF77A0E2D1298EDB019E2A1E67E3F7BD4B1C7616DC0" />
+      <CertPublisher Value="Instant Housecall" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_70" Name="IP Ter-Osipov Aleksey Vladimirovich (leaf)">
+      <CertRoot Type="TBS" Value="FA04F43A5443C28C589D120DFE944F4DD92B88B1A6E16E70BF56E0E02A5039D6" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_71" Name="IP Ter-Osipov Aleksey Vladimirovich (publisher)">
+      <CertRoot Type="TBS" Value="B8B44319D788EA6EC3E7DEA27FAB059D25E3C4DCF09FCD1C67BE7FAED44A6B02" />
+      <CertPublisher Value="IP Ter-Osipov Aleksey Vladimirovich" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_72" Name="ISL Online Ltd. (leaf)">
+      <CertRoot Type="TBS" Value="58677BAACCC95917DB9563F5D5242F1D2698979DB6A9B5F62AE0505310313509" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_73" Name="ISL Online Ltd. (leaf)">
+      <CertRoot Type="TBS" Value="9CBCE00F9DC8DDB327404D3E1447135DEEB25C2A164CD52E01BEE514E4389C8C" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_74" Name="ISL Online Ltd. (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="ISL Online Ltd." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_75" Name="KHELPDESK TECHNOLOGY LTDA (leaf)">
+      <CertRoot Type="TBS" Value="713A432503EF08193FF63C6A06EC2D8E2B7F43D959913CD8FA957E2CEEA74D11" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_76" Name="KHELPDESK TECHNOLOGY LTDA (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="KHELPDESK TECHNOLOGY LTDA" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_77" Name="Knowhow Electel Inc. (leaf)">
+      <CertRoot Type="TBS" Value="C4F71E6C60106FA76F86A3378BD1C94446A308C6DDB90BCD24A8D0F12F4439C8" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_78" Name="Knowhow Electel Inc. (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="Knowhow Electel Inc." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_79" Name="KOINO Co., Ltd. (leaf)">
+      <CertRoot Type="TBS" Value="020CC42001777F5F5CE04E563E31D6C76122A95B88FA65C7EDEBB57EE5DC515D" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_80" Name="KOINO Co., Ltd. (leaf)">
+      <CertRoot Type="TBS" Value="A284F460594883DEDB9A50D512267AC253781D3BA19D661FF75301B01F42505B" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_81" Name="KOINO Co., Ltd. (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="KOINO Co., Ltd." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_82" Name="Kopetra Ltd. (leaf)">
+      <CertRoot Type="TBS" Value="18450D4DFF502326C24240AA0A1A1971DA4DC7C96D3613B64180FDCE318A710A" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_83" Name="Kopetra Ltd. (publisher)">
+      <CertRoot Type="TBS" Value="F55821C081B58E86EAA202923E715E1524C422C7BE0469B13A9E7A319E50D70CB5B67E864273029A79250F9DC3203CBD" />
+      <CertPublisher Value="Kopetra Ltd." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_84" Name="Level Software, Inc. (leaf)">
+      <CertRoot Type="TBS" Value="E8AA74CF2C7EB35E60035F950B6FAC58167895F1EEBA7EC82DC5F4DE932E552C" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_85" Name="Level Software, Inc. (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="Level Software, Inc." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_86" Name="LinkMeMine Inc. (leaf)">
+      <CertRoot Type="TBS" Value="49B0710E504BB0C046582AEDF5A63F4B02DAD10B6E658202EE041F5273B862D6" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_87" Name="LinkMeMine Inc. (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="LinkMeMine Inc." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_88" Name="MOONWHITE TECHNOLOGIES PRIVATE LIMITED (leaf)">
+      <CertRoot Type="TBS" Value="6B821F86FE4BBA52D0133032FF5F1C3AE5BF0EA100CBF7950FE9B41BB479A5A2" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_89" Name="MOONWHITE TECHNOLOGIES PRIVATE LIMITED (publisher)">
+      <CertRoot Type="TBS" Value="D9C7DB0B704F07089440C56E69A0F31D730EDF77CFBF7514630E8B5390A270FE" />
+      <CertPublisher Value="MOONWHITE TECHNOLOGIES PRIVATE LIMITED" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_90" Name="Nanosystems S.r.l. (leaf)">
+      <CertRoot Type="TBS" Value="80DBBFCC90AE6B0A762142ACC30DAEA34798B27CF1F139A80C9A0A4B77A078567B76970423CAEE0F4DB06FD01C2616CB" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_91" Name="Nanosystems S.r.l. (leaf)">
+      <CertRoot Type="TBS" Value="F437911CEA37149CDE7F297D4086B2C11B2FF9BDCF803EB5217DEBEFF946AFA2" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_92" Name="Nanosystems S.r.l. (publisher)">
+      <CertRoot Type="TBS" Value="17653C0976E1370DA584B5EAF4A6DEB1D3B7CAD97C2F12592E7B96C5302B88BDE20B30FA5963EF0AC9F2063083B48E9E" />
+      <CertPublisher Value="Nanosystems S.r.l." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_93" Name="Nanosystems S.r.l. (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="Nanosystems S.r.l." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_94" Name="Net Transmit &amp; Receive SL (leaf)">
+      <CertRoot Type="TBS" Value="CEA0DE18000EA92E942B8542864C3E0E917AA829" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_95" Name="Ngrok, Inc. (leaf)">
+      <CertRoot Type="TBS" Value="7C72DBDA4F283D3BE2B848ABD1085B3B3BA7E08C4E8258204EBDE026BD92F14A" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_96" Name="Ngrok, Inc. (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="Ngrok, Inc." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_97" Name="NinjaOne LLC (leaf)">
+      <CertRoot Type="TBS" Value="86F782F1A670EA324DDEEEA06770E9CA9016CB22E06F9487B7F7BC5BFCC42D4D" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_98" Name="NinjaOne LLC (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="NinjaOne LLC" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_99" Name="pcvisit software ag (leaf)">
+      <CertRoot Type="TBS" Value="85E765462871AC9D332C18A9B833A862E2811C83" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_100" Name="pcvisit software ag (leaf)">
+      <CertRoot Type="TBS" Value="DF2D3F07BFECA2179556AC23F8E9B66E459DB2C39415100C92FF4399914B348E" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_101" Name="pcvisit software ag (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="pcvisit software ag" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_102" Name="PhaseFive Systems LLC (leaf)">
+      <CertRoot Type="TBS" Value="1BF55DAA063110C36CA3667802D5FAB3FC46D99873BB470CE1E0DD395354BEB6" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_103" Name="PhaseFive Systems LLC (publisher)">
+      <CertRoot Type="TBS" Value="F55821C081B58E86EAA202923E715E1524C422C7BE0469B13A9E7A319E50D70CB5B67E864273029A79250F9DC3203CBD" />
+      <CertPublisher Value="PhaseFive Systems LLC" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_104" Name="Plooto Star Inc (leaf)">
+      <CertRoot Type="TBS" Value="7B52CC79655A10EFA296154B6DA7D9C0E3F1809EC964F230D88760839031B5EE" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_105" Name="Plooto Star Inc (publisher)">
+      <CertRoot Type="TBS" Value="F55821C081B58E86EAA202923E715E1524C422C7BE0469B13A9E7A319E50D70CB5B67E864273029A79250F9DC3203CBD" />
+      <CertPublisher Value="Plooto Star Inc" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_106" Name="remot3.it, Inc. (leaf)">
+      <CertRoot Type="TBS" Value="43481AF681DAA2D11BC8AF8A17F460D58F9AC2090566D733DF524702D21759BE" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_107" Name="remot3.it, Inc. (publisher)">
+      <CertRoot Type="TBS" Value="49B229A10F850DE5B85110A0E0F59C48DD12B116C9AD236A3F16C5BDFBC968D5" />
+      <CertPublisher Value="remot3.it, Inc." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_108" Name="REMOTE UTILITIES PTE. LTD. (leaf)">
+      <CertRoot Type="TBS" Value="71C30D19075D1001F83096B3CD51499F27CA5A56D6F3E96230E3AEF8CC54193F" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_109" Name="REMOTE UTILITIES PTE. LTD. (publisher)">
+      <CertRoot Type="TBS" Value="D9C7DB0B704F07089440C56E69A0F31D730EDF77CFBF7514630E8B5390A270FE" />
+      <CertPublisher Value="REMOTE UTILITIES PTE. LTD." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_110" Name="Rsupport Co., Ltd. (leaf)">
+      <CertRoot Type="TBS" Value="605D6F3966D4A3CC4B47173E720C2008D69A3002B0F6D68D1254DAC2DFB74811" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_111" Name="Rsupport Co., Ltd. (leaf)">
+      <CertRoot Type="TBS" Value="B3DC999E7012E48014168B31AB4C5B7D0298279045D1751C367DCDE8101E6715" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_112" Name="Rsupport Co., Ltd. (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="Rsupport Co., Ltd." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_113" Name="Servably Inc. (leaf)">
+      <CertRoot Type="TBS" Value="61224C7F489B971FC46E4C2588227DB24B13E1DEA24682873DAEDF789D000110" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_114" Name="Servably Inc. (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="Servably Inc." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_115" Name="ShowMyPC INC (leaf)">
+      <CertRoot Type="TBS" Value="1A76493B74AA1DB9F61663C57AE3346BD30CAA5AB6AD6F153A139F32B7DD47CE" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_116" Name="ShowMyPC INC (leaf)">
+      <CertRoot Type="TBS" Value="F9DBC445B6F1DCD3290171F8078F8B8728C7E33740EDE901C5F8B3609F13729A" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_117" Name="ShowMyPC INC (publisher)">
+      <CertRoot Type="TBS" Value="20ADC5B59CB532E215F01BA09A9C745898C206555613512FEA7C295CCFD17CED4FE2C5BC3274CA8A270FC68799B8343C" />
+      <CertPublisher Value="ShowMyPC INC" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_118" Name="ShowMyPC INC (publisher)">
+      <CertRoot Type="TBS" Value="F55821C081B58E86EAA202923E715E1524C422C7BE0469B13A9E7A319E50D70CB5B67E864273029A79250F9DC3203CBD" />
+      <CertPublisher Value="ShowMyPC INC" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_119" Name="SimpleHelp Ltd (leaf)">
+      <CertRoot Type="TBS" Value="0DF6FD998C3D6B2B27E62F956EDEFDF9DF401852DA91B400B46E2C5984FEAEB4" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_120" Name="SimpleHelp Ltd (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="SimpleHelp Ltd" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_121" Name="Spytech Software and Design, Inc. (leaf)">
+      <CertRoot Type="TBS" Value="8B7CCC805C90CC1A4735481CDCECF635D5F717A4A0E64633BFF4004159DB20F3" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_122" Name="Spytech Software and Design, Inc. (publisher)">
+      <CertRoot Type="TBS" Value="F55821C081B58E86EAA202923E715E1524C422C7BE0469B13A9E7A319E50D70CB5B67E864273029A79250F9DC3203CBD" />
+      <CertPublisher Value="Spytech Software and Design, Inc." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_123" Name="Superops Inc. (leaf)">
+      <CertRoot Type="TBS" Value="6FC3528D9A124269BC118D91FE5981D245C27CB22E16B8A3CC842F965C42E68F9E59F5D5DA7383CCD7C74710B6D5A071" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_124" Name="Superops Inc. (publisher)">
+      <CertRoot Type="TBS" Value="0EEB0F83C55CCAAF275CEC9CAAED00280B6DD9BD8E37BD8A191A5CF77A0E2D1298EDB019E2A1E67E3F7BD4B1C7616DC0" />
+      <CertPublisher Value="Superops Inc." />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_125" Name="Yurii Honcharuk (leaf)">
+      <CertRoot Type="TBS" Value="588198672AD8D7C7E9F07B777AE537D38CFC8A3E1FC6AA29D29B1D5C6AAA34B62094E703FFD5A0193990E14A57848D89" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_126" Name="Yurii Honcharuk (publisher)">
+      <CertRoot Type="TBS" Value="0EEB0F83C55CCAAF275CEC9CAAED00280B6DD9BD8E37BD8A191A5CF77A0E2D1298EDB019E2A1E67E3F7BD4B1C7616DC0" />
+      <CertPublisher Value="Yurii Honcharuk" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_127" Name="AnyDesk Software GmbH (leaf)">
+      <CertRoot Type="TBS" Value="C36E79D8AD413C48DD554CE693A4A7DB944E5FA29CE2440937376D5CFEB13A26" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_128" Name="AnyDesk Software GmbH (publisher)">
+      <CertRoot Type="TBS" Value="65B1D4076A89AE273F57E6EEEDECB3EAE129B4168F76FA7671914CDF461D542255C59D9B85B916AE0CA6FC0FCF7A8E64" />
+      <CertPublisher Value="AnyDesk Software GmbH" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_129" Name="PURSLANE (leaf)">
+      <CertRoot Type="TBS" Value="4E307F95ADF3832D0201686EA28EF472959B171EE9D1EFA2ABCF3793766D0E16" />
+    </Signer>
+    <Signer ID="ID_SIGNER_RMM_130" Name="PURSLANE (publisher)">
+      <CertRoot Type="TBS" Value="F55821C081B58E86EAA202923E715E1524C422C7BE0469B13A9E7A319E50D70CB5B67E864273029A79250F9DC3203CBD" />
+      <CertPublisher Value="PURSLANE" />
+    </Signer>
+  </Signers>
+  <!--Driver Signing Scenarios-->
+  <SigningScenarios>
+    <SigningScenario Value="131" ID="ID_SIGNINGSCENARIO_DRIVERS_1" FriendlyName="Auto generated policy on 08-17-2015">
+      <ProductSigners>
+        <FileRulesRef>
+          <FileRuleRef RuleID="ID_ALLOW_A_1" />
+        </FileRulesRef>
+      </ProductSigners>
+    </SigningScenario>
+    <SigningScenario Value="12" ID="ID_SIGNINGSCENARIO_WINDOWS" FriendlyName="Auto generated policy on 08-17-2015">
+      <ProductSigners>
+        <DeniedSigners>
+          <DeniedSigner SignerId="ID_SIGNER_RMM_1" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_2" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_3" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_4" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_5" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_6" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_7" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_8" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_9" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_10" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_11" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_12" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_13" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_14" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_15" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_16" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_17" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_18" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_19" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_20" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_21" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_22" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_23" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_24" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_25" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_26" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_27" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_28" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_29" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_30" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_31" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_32" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_33" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_34" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_35" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_36" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_37" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_38" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_39" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_40" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_41" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_42" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_43" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_44" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_45" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_46" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_47" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_48" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_49" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_50" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_51" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_52" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_53" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_54" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_55" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_56" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_57" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_58" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_59" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_60" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_61" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_62" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_63" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_64" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_65" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_66" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_67" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_68" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_69" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_70" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_71" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_72" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_73" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_74" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_75" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_76" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_77" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_78" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_79" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_80" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_81" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_82" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_83" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_84" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_85" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_86" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_87" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_88" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_89" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_90" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_91" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_92" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_93" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_94" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_95" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_96" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_97" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_98" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_99" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_100" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_101" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_102" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_103" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_104" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_105" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_106" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_107" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_108" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_109" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_110" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_111" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_112" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_113" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_114" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_115" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_116" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_117" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_118" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_119" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_120" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_121" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_122" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_123" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_124" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_125" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_126" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_127" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_128" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_129" />
+          <DeniedSigner SignerId="ID_SIGNER_RMM_130" />
+        </DeniedSigners>
+        <FileRulesRef>
+          <FileRuleRef RuleID="ID_ALLOW_A_2" />
+          <FileRuleRef RuleID="ID_DENY_RMM_F_1" />
+        </FileRulesRef>
+      </ProductSigners>
+    </SigningScenario>
+  </SigningScenarios>
+  <UpdatePolicySigners />
+  <CiSigners>
+    <CiSigner SignerId="ID_SIGNER_RMM_1" />
+    <CiSigner SignerId="ID_SIGNER_RMM_2" />
+    <CiSigner SignerId="ID_SIGNER_RMM_3" />
+    <CiSigner SignerId="ID_SIGNER_RMM_4" />
+    <CiSigner SignerId="ID_SIGNER_RMM_5" />
+    <CiSigner SignerId="ID_SIGNER_RMM_6" />
+    <CiSigner SignerId="ID_SIGNER_RMM_7" />
+    <CiSigner SignerId="ID_SIGNER_RMM_8" />
+    <CiSigner SignerId="ID_SIGNER_RMM_9" />
+    <CiSigner SignerId="ID_SIGNER_RMM_10" />
+    <CiSigner SignerId="ID_SIGNER_RMM_11" />
+    <CiSigner SignerId="ID_SIGNER_RMM_12" />
+    <CiSigner SignerId="ID_SIGNER_RMM_13" />
+    <CiSigner SignerId="ID_SIGNER_RMM_14" />
+    <CiSigner SignerId="ID_SIGNER_RMM_15" />
+    <CiSigner SignerId="ID_SIGNER_RMM_16" />
+    <CiSigner SignerId="ID_SIGNER_RMM_17" />
+    <CiSigner SignerId="ID_SIGNER_RMM_18" />
+    <CiSigner SignerId="ID_SIGNER_RMM_19" />
+    <CiSigner SignerId="ID_SIGNER_RMM_20" />
+    <CiSigner SignerId="ID_SIGNER_RMM_21" />
+    <CiSigner SignerId="ID_SIGNER_RMM_22" />
+    <CiSigner SignerId="ID_SIGNER_RMM_23" />
+    <CiSigner SignerId="ID_SIGNER_RMM_24" />
+    <CiSigner SignerId="ID_SIGNER_RMM_25" />
+    <CiSigner SignerId="ID_SIGNER_RMM_26" />
+    <CiSigner SignerId="ID_SIGNER_RMM_27" />
+    <CiSigner SignerId="ID_SIGNER_RMM_28" />
+    <CiSigner SignerId="ID_SIGNER_RMM_29" />
+    <CiSigner SignerId="ID_SIGNER_RMM_30" />
+    <CiSigner SignerId="ID_SIGNER_RMM_31" />
+    <CiSigner SignerId="ID_SIGNER_RMM_32" />
+    <CiSigner SignerId="ID_SIGNER_RMM_33" />
+    <CiSigner SignerId="ID_SIGNER_RMM_34" />
+    <CiSigner SignerId="ID_SIGNER_RMM_35" />
+    <CiSigner SignerId="ID_SIGNER_RMM_36" />
+    <CiSigner SignerId="ID_SIGNER_RMM_37" />
+    <CiSigner SignerId="ID_SIGNER_RMM_38" />
+    <CiSigner SignerId="ID_SIGNER_RMM_39" />
+    <CiSigner SignerId="ID_SIGNER_RMM_40" />
+    <CiSigner SignerId="ID_SIGNER_RMM_41" />
+    <CiSigner SignerId="ID_SIGNER_RMM_42" />
+    <CiSigner SignerId="ID_SIGNER_RMM_43" />
+    <CiSigner SignerId="ID_SIGNER_RMM_44" />
+    <CiSigner SignerId="ID_SIGNER_RMM_45" />
+    <CiSigner SignerId="ID_SIGNER_RMM_46" />
+    <CiSigner SignerId="ID_SIGNER_RMM_47" />
+    <CiSigner SignerId="ID_SIGNER_RMM_48" />
+    <CiSigner SignerId="ID_SIGNER_RMM_49" />
+    <CiSigner SignerId="ID_SIGNER_RMM_50" />
+    <CiSigner SignerId="ID_SIGNER_RMM_51" />
+    <CiSigner SignerId="ID_SIGNER_RMM_52" />
+    <CiSigner SignerId="ID_SIGNER_RMM_53" />
+    <CiSigner SignerId="ID_SIGNER_RMM_54" />
+    <CiSigner SignerId="ID_SIGNER_RMM_55" />
+    <CiSigner SignerId="ID_SIGNER_RMM_56" />
+    <CiSigner SignerId="ID_SIGNER_RMM_57" />
+    <CiSigner SignerId="ID_SIGNER_RMM_58" />
+    <CiSigner SignerId="ID_SIGNER_RMM_59" />
+    <CiSigner SignerId="ID_SIGNER_RMM_60" />
+    <CiSigner SignerId="ID_SIGNER_RMM_61" />
+    <CiSigner SignerId="ID_SIGNER_RMM_62" />
+    <CiSigner SignerId="ID_SIGNER_RMM_63" />
+    <CiSigner SignerId="ID_SIGNER_RMM_64" />
+    <CiSigner SignerId="ID_SIGNER_RMM_65" />
+    <CiSigner SignerId="ID_SIGNER_RMM_66" />
+    <CiSigner SignerId="ID_SIGNER_RMM_67" />
+    <CiSigner SignerId="ID_SIGNER_RMM_68" />
+    <CiSigner SignerId="ID_SIGNER_RMM_69" />
+    <CiSigner SignerId="ID_SIGNER_RMM_70" />
+    <CiSigner SignerId="ID_SIGNER_RMM_71" />
+    <CiSigner SignerId="ID_SIGNER_RMM_72" />
+    <CiSigner SignerId="ID_SIGNER_RMM_73" />
+    <CiSigner SignerId="ID_SIGNER_RMM_74" />
+    <CiSigner SignerId="ID_SIGNER_RMM_75" />
+    <CiSigner SignerId="ID_SIGNER_RMM_76" />
+    <CiSigner SignerId="ID_SIGNER_RMM_77" />
+    <CiSigner SignerId="ID_SIGNER_RMM_78" />
+    <CiSigner SignerId="ID_SIGNER_RMM_79" />
+    <CiSigner SignerId="ID_SIGNER_RMM_80" />
+    <CiSigner SignerId="ID_SIGNER_RMM_81" />
+    <CiSigner SignerId="ID_SIGNER_RMM_82" />
+    <CiSigner SignerId="ID_SIGNER_RMM_83" />
+    <CiSigner SignerId="ID_SIGNER_RMM_84" />
+    <CiSigner SignerId="ID_SIGNER_RMM_85" />
+    <CiSigner SignerId="ID_SIGNER_RMM_86" />
+    <CiSigner SignerId="ID_SIGNER_RMM_87" />
+    <CiSigner SignerId="ID_SIGNER_RMM_88" />
+    <CiSigner SignerId="ID_SIGNER_RMM_89" />
+    <CiSigner SignerId="ID_SIGNER_RMM_90" />
+    <CiSigner SignerId="ID_SIGNER_RMM_91" />
+    <CiSigner SignerId="ID_SIGNER_RMM_92" />
+    <CiSigner SignerId="ID_SIGNER_RMM_93" />
+    <CiSigner SignerId="ID_SIGNER_RMM_94" />
+    <CiSigner SignerId="ID_SIGNER_RMM_95" />
+    <CiSigner SignerId="ID_SIGNER_RMM_96" />
+    <CiSigner SignerId="ID_SIGNER_RMM_97" />
+    <CiSigner SignerId="ID_SIGNER_RMM_98" />
+    <CiSigner SignerId="ID_SIGNER_RMM_99" />
+    <CiSigner SignerId="ID_SIGNER_RMM_100" />
+    <CiSigner SignerId="ID_SIGNER_RMM_101" />
+    <CiSigner SignerId="ID_SIGNER_RMM_102" />
+    <CiSigner SignerId="ID_SIGNER_RMM_103" />
+    <CiSigner SignerId="ID_SIGNER_RMM_104" />
+    <CiSigner SignerId="ID_SIGNER_RMM_105" />
+    <CiSigner SignerId="ID_SIGNER_RMM_106" />
+    <CiSigner SignerId="ID_SIGNER_RMM_107" />
+    <CiSigner SignerId="ID_SIGNER_RMM_108" />
+    <CiSigner SignerId="ID_SIGNER_RMM_109" />
+    <CiSigner SignerId="ID_SIGNER_RMM_110" />
+    <CiSigner SignerId="ID_SIGNER_RMM_111" />
+    <CiSigner SignerId="ID_SIGNER_RMM_112" />
+    <CiSigner SignerId="ID_SIGNER_RMM_113" />
+    <CiSigner SignerId="ID_SIGNER_RMM_114" />
+    <CiSigner SignerId="ID_SIGNER_RMM_115" />
+    <CiSigner SignerId="ID_SIGNER_RMM_116" />
+    <CiSigner SignerId="ID_SIGNER_RMM_117" />
+    <CiSigner SignerId="ID_SIGNER_RMM_118" />
+    <CiSigner SignerId="ID_SIGNER_RMM_119" />
+    <CiSigner SignerId="ID_SIGNER_RMM_120" />
+    <CiSigner SignerId="ID_SIGNER_RMM_121" />
+    <CiSigner SignerId="ID_SIGNER_RMM_122" />
+    <CiSigner SignerId="ID_SIGNER_RMM_123" />
+    <CiSigner SignerId="ID_SIGNER_RMM_124" />
+    <CiSigner SignerId="ID_SIGNER_RMM_125" />
+    <CiSigner SignerId="ID_SIGNER_RMM_126" />
+    <CiSigner SignerId="ID_SIGNER_RMM_127" />
+    <CiSigner SignerId="ID_SIGNER_RMM_128" />
+    <CiSigner SignerId="ID_SIGNER_RMM_129" />
+    <CiSigner SignerId="ID_SIGNER_RMM_130" />
+  </CiSigners>
+  <HvciOptions>0</HvciOptions>
+  <Settings>
+    <Setting Provider="AllHostIds" Key="AllKeys" ValueName="EnterpriseDefinedClsId">
+      <Value>
+        <Boolean>true</Boolean>
+      </Value>
+    </Setting>
+    <Setting Provider="PolicyInfo" Key="Information" ValueName="Name">
+      <Value>
+        <String>Remote Access Tool Blocker (lolrmm) - Audit [T0A1S0R1]</String>
+      </Value>
+    </Setting>
+    <Setting Provider="PolicyInfo" Key="Information" ValueName="Id">
+      <Value>
+        <String>1.2610.1113.2659</String>
+      </Value>
+    </Setting>
+  </Settings>
+</SiPolicy>

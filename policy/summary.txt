@@ -1,0 +1,7 @@
+﻿Build-RmmAppControl v2026-10-11.3  -  2026-10-11 13:26:59
+Catalogue : 359 tools  SHA256 87D366BBF205C9B921E16F51DA607433E99F783D63B3E8C276FCF39A3D4FD66E
+Policy    : {2D13BFB7-4304-4847-9CDD-37820D3EE9B7}  version 1.2610.1113.2659
+Rules     : 140 deny rules, 52 vendors, 55 tools
+Tools     : Action1; AeroAdmin; Any Support; AnyDesk; Anyplace Control; Atera; AweRay; Connectwise Automate (LabTech); ConnectWise Control; Domotz; DW Service; FastViewer; FleetDeck.io; GetScreen; Gorelo RMM; HelpU; HopToDesk; Instant Housecall; ISL Light; ISL Online; Jump Desktop; KHelpDesk; LabTech RMM (Now ConnectWise Automate); Level; Level.io; Lite Manager; MeshCentral; ngrok; NinjaRMM; NTR Remote; Pcvisit; Pilixo; PuTTY Tray; Remote Desktop Plus; Remote Manipulator System; Remote Utilities; Remote.it; RemoteCall; RemoteView; RuDesktop; RustDesk; ScreenConnect; Seetrol; ShowMyPC; SimpleHelp; Splashtop; Splashtop Remote; SpyAnywhere; SuperOps; Supremo; Syncro; Tactical RMM; TeamViewer; UltraViewer; Xeox
+Toggles   : T=TeamViewer (6 rules), A=AnyDesk (2 rules), S=Splashtop (4 rules), R=RustDesk (2 rules)  default T1A1S0R1
+Install   : START-HERE (checkboxes) or Install-RmmAppControl -Mode Enforce -Variant T1A1S0

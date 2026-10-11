@@ -1,0 +1,6 @@
+# build output - release ZIPs are attached to GitHub releases, never committed
+dist/
+
+# scratch
+*.tmp
+*.log
