@@ -38,6 +38,8 @@ The App Control layer is the load-bearing one. The ESET layers are optional extr
    accept the administrator prompt.
 4. Tick or untick **TeamViewer / AnyDesk / Splashtop / RustDesk**. Ticked = blocked.
 5. Press **BLOCK**.
+6. **Full kit only: a technician must then paste the website list into ESET BY HAND** — the tool cannot do it and
+   cannot verify it. See [The ESET paste](#the-eset-paste--must-be-done-by-hand-by-a-technician).
 
 When the block is applied, the kit also copies a **standalone undo tool** to
 `C:\RemoteAccessToolBlocker` on that PC — see [Undoing it later](#undoing-it-later). It is there so the block can
@@ -49,6 +51,67 @@ ESET — the guide that opens has the two-click steps.
 The status line always shows the current state — **PROTECTED**, **TEST MODE** or **NOT protected** — and what each
 toggle is set to. **Refresh status** lists recent events: `[3077]` means a program was blocked, `[3076]` means one
 *would* have been blocked (audit mode).
+
+### The ESET paste — **MUST BE DONE BY HAND BY A TECHNICIAN**
+
+> ## ⚠️ THIS STEP CANNOT BE AUTOMATED. A TECHNICIAN MUST DO IT BY HAND.
+>
+> The **BLOCK** button does everything else itself. It **cannot** add the website list to ESET: ESET's URL list is
+> a GUI import/paste with no scriptable interface, and this project deliberately does not guess at ESET's
+> configuration XML. **A technician must copy the list and paste it into ESET by hand, following the steps below.**
+>
+> **Do not skip this step and do not assume it happened.** Until it is done, the ESET website layer of the block is
+> not active — the programs are still blocked by Windows App Control, but the tools' download sites and web
+> consoles are not.
+
+**Before you start:** the **BLOCK** button has already blocked the programs, built the list and **copied it to your
+clipboard**. It also prints the **exact path of the import file** in the window, like this:
+
+```
+  IMPORT FILE: C:\Users\<you>\LOLRMM-UrlList\latest\eset-blocked-urls.txt
+  (406 entries)
+  -> list copied to the clipboard (verified) and opening ESET ...
+```
+
+**If the clipboard does not work** — common when the window is running elevated, since an elevated process can own
+a different clipboard from your own session — the window says so and tells you to use the file instead:
+
+```
+  -> could NOT copy to the clipboard. Use the IMPORT FILE above:
+     in ESET choose Import and pick that eset-blocked-urls.txt file.
+```
+
+Either route works. The clipboard is faster; the file always works. **The list is never lost — it is always on disk
+at the path the window prints.**
+
+It takes about a minute from here.
+
+**Follow these steps exactly. Every action below is done by hand in the ESET window.**
+
+| # | **Do this by hand** |
+|---|---|
+| 1 | **Press `F5`** in ESET to open **Advanced setup**. |
+| 2 | Click **Protections** → **Web access protection**. |
+| 3 | Open **URL list management**, then next to **Address list** click **Edit**. |
+| 4 | **Make your own list** so undo is one click later: click **Add** (**in the *Address list* window — NOT inside an existing list**), set Address list type to **Blocked**, name it **`RMM scam block (lolrmm)`**, and leave **List active** ticked. |
+| 5 | Inside that list click **Add** → tick **Enter multiple values**. |
+| 6 | **Click in the box and press `Ctrl+V`** to paste the whole list, then click **OK**. *(No clipboard? Use the **Import** button and choose `eset-blocked-urls.txt` from the folder that opened.)* |
+| 7 | Click **OK** on every window, then **OK** in Advanced setup to save. |
+| 8 | **Also block the programs' backstop:** in Advanced setup type **`unsafe`** in the search box and turn **ON** *"Enable detection of potentially unsafe applications"*, then click **OK**. |
+
+> **No `Add` button in step 4?** Paste into ESET's built-in **List of blocked addresses** → **Edit** instead.
+> Undo then takes more work — see the ESET removal guide.
+
+**Test it — by hand:** open a browser and go to **`anydesk.com`**. ESET should show its **"page blocked"** message.
+If it loads normally, the paste did not take — repeat steps 1–7.
+
+**To take the list back out (by hand):** `F5` → **Protections** → **Web access protection** →
+**URL list management** → **Address list** → **Edit**, then select **`RMM scam block (lolrmm)`** → **Remove**, or
+untick **List active** to switch it off but keep it. `OK` → `OK`.
+
+Full detail, including the wording differences between ESET versions, the undo for the built-in list, and the
+entries to remove if a client really uses Quick Assist or Chrome Remote Desktop:
+[`docs/eset-import-guide.md`](docs/eset-import-guide.md).
 
 ### Undoing it later
 
@@ -198,8 +261,10 @@ GUID. More detail, including a safe way to trigger a policy check without actual
 - **The window buttons have not been clicked by an automated test.** Each window opens and was inspected, but the
   BLOCK/UNDO/Test buttons need administrator rights and were exercised by hand, not automatically. They call the
   same install script that *was* verified.
-- **The ESET website paste is manual.** ESET's URL list import is not scripted. See
-  [`docs/eset-import-guide.md`](docs/eset-import-guide.md).
+- **The ESET website paste is manual and a technician MUST do it by hand.** ESET's URL list import is not
+  scripted, and the tool cannot verify it happened.
+  See [The ESET paste](#the-eset-paste--must-be-done-by-hand-by-a-technician)
+  and [`docs/eset-import-guide.md`](docs/eset-import-guide.md).
 - **The ESET website list only covers HTTP/HTTPS**, and HTTPS needs ESET's SSL/TLS filtering enabled. A tool that
   is already installed and connects over its own protocol may still connect.
 - **Vendor certificates rotate.** Rebuilding periodically from the upstream catalogue keeps the list current; the

@@ -22,7 +22,17 @@ $ScriptVersion = '2026-10-11.3'
 $PolicyGuid = '{2D13BFB7-4304-4847-9CDD-37820D3EE9B7}'   # must match Build-/Install-RmmAppControl
 $bare = $PolicyGuid.Trim('{}').ToLowerInvariant()
 $Here = $PSScriptRoot
-$UrlOut = Join-Path $env:USERPROFILE 'LOLRMM-UrlList\latest'
+# Where the generated ESET import file goes. Resolved defensively: this line runs BEFORE the
+# window is built, so an unguarded Join-Path here kills the whole script (no window at all)
+# on any host where USERPROFILE is unset.
+if ($env:USERPROFILE) {
+    $UrlOut = Join-Path $env:USERPROFILE 'LOLRMM-UrlList\latest'
+} else {
+    $UrlOut = Join-Path $Here 'LOLRMM-UrlList\latest'
+}
+# The file the ESET import step needs. Shown to the operator so the list can always be found
+# even when the clipboard does not cooperate.
+$UrlListFile = Join-Path $UrlOut 'eset-blocked-urls.txt'
 
 # ------------------------------------------------------------------ parts
 # Repo layout (see README "Repository layout"):
@@ -137,8 +147,19 @@ $btnLog.Text = 'Refresh status / show recent blocks'; $btnLog.Location = New-Obj
 $btnLog.Size = New-Object Drawing.Size(280, 30); $btnLog.Anchor = 'Bottom, Left'
 $form.Controls.Add($btnLog)
 
-function Say([string]$m) {
-    $log.AppendText($m + "`r`n"); [Windows.Forms.Application]::DoEvents()
+function Say([string]$m, [string]$color = '') {
+    # colour is optional: 'Red'/'Yellow'/'Green' for the lines an operator must not miss.
+    # The on-screen box is this window's output surface, so every line lands there too.
+    $log.AppendText($m + "`r`n")
+    if ($color) {
+        $n = $log.TextLength
+        $log.SelectionStart = $n - $m.Length - 2
+        $log.SelectionLength = $m.Length
+        $log.SelectionColor = [Drawing.Color]::FromName($color)
+        $log.SelectionStart = $n
+        $log.SelectionLength = 0
+    }
+    [Windows.Forms.Application]::DoEvents()
 }
 function Run-Script([string]$path, [string[]]$scriptArgs) {
     $out = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $path @scriptArgs 2>&1
@@ -226,15 +247,47 @@ $btnDo.Add_Click({
         if (-not $chkA.Checked) { $exTools += 'AnyDesk'; $allow += 'anydesk.com' }
         if (-not $chkR.Checked) { $exTools += 'RustDesk'; $allow += 'rustdesk.com' }
         Say "  Website list leaves out: $(($exTools | Where-Object { $_ -notin 'mstsc', 'NVDA' }) -join ', ')$(if (-not ($exTools | Where-Object { $_ -notin 'mstsc', 'NVDA' })) { '(nothing)' })"
-        if ($urlScript -and (Run-Script $urlScript @('-OutDir', $UrlOut, '-ExcludeTool', ($exTools -join ','), '-AllowDomain', ($allow -join ','))) -eq 0 -and (Test-Path -LiteralPath (Join-Path $UrlOut 'eset-blocked-urls.txt'))) {
-            Set-Clipboard -Value (Get-Content -LiteralPath (Join-Path $UrlOut 'eset-blocked-urls.txt'))
-            Say '  -> list copied to the clipboard. Opening ESET and the guide ...'
+        if (-not $urlScript) {
+            Say '  -> the URL list generator was not found next to this window.' 'Red'
+            Say ('     Looked in: ' + $Parts.Eset) 'Yellow'
+        } elseif ((Run-Script $urlScript @('-OutDir', $UrlOut, '-ExcludeTool', ($exTools -join ','), '-AllowDomain', ($allow -join ','))) -ne 0) {
+            Say '  -> the URL list generator failed - see its output above.' 'Red'
+        } elseif (-not (Test-Path -LiteralPath $UrlListFile)) {
+            Say ('  -> the generator ran but produced no file at ' + $UrlListFile) 'Red'
+        } else {
+            $lines = @(Get-Content -LiteralPath $UrlListFile)
+            # ALWAYS tell the operator where the file is. The clipboard can silently fail
+            # (elevated/hidden windows can own a different clipboard), and without this the
+            # list is written to a path nobody was ever told about.
+            Say ''
+            Say ('  IMPORT FILE: ' + $UrlListFile) 'White'
+            Say ('  (' + $lines.Count + ' entries)') 'White'
+
+            $clipOk = $false
+            try {
+                Set-Clipboard -Value $lines -ErrorAction Stop
+                # read it back: Set-Clipboard returns nothing, so verify rather than assume
+                $back = @(Get-Clipboard -ErrorAction Stop)
+                $clipOk = ($back.Count -ge $lines.Count -and $back[0] -eq $lines[0])
+            } catch { $clipOk = $false }
+
+            if ($clipOk) {
+                Say '  -> list copied to the clipboard (verified) and opening ESET ...' 'Green'
+            } else {
+                Say '  -> could NOT copy to the clipboard. Use the IMPORT FILE above:' 'Red'
+                Say '     in ESET choose Import and pick that eset-blocked-urls.txt file.' 'Yellow'
+            }
             Say '  Tip: paste it into a NEW list named "RMM scam block (lolrmm)" so UNDO is one click.'
             Open-EsetAndGuide
             Say ''
             Say 'LAST STEP (by hand): in ESET press F5 and follow the guide in Notepad -'
-            Say 'paste the list into "List of blocked addresses" and click OK.'
-        } else { Say '  -> could not build the website list (is this PC online?).' }
+            if ($clipOk) {
+                Say 'click "Enter multiple values" and press Ctrl+V, then OK -> OK.'
+            } else {
+                Say ('click Import and choose: ' + $UrlListFile)
+            }
+            Say ('  [log] ESET import file: ' + $UrlListFile + ' (' + $lines.Count + ' entries, clipboard=' + $clipOk + ')')
+        }
     } catch { Say "ERROR: $($_.Exception.Message)" }
     Update-Status; Busy $false
 })

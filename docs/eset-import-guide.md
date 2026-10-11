@@ -1,8 +1,13 @@
-# ESET import guide — the manual step
+# ESET import guide — **MUST BE DONE BY HAND BY A TECHNICIAN**
 
-The App Control layer is fully scripted. **Adding the website list to ESET is the one step you do by hand** —
-ESET's URL-list import was never captured in a form that could be scripted safely, so the tool generates the file,
-copies it to the clipboard and opens ESET for you.
+> ## ⚠️ THIS STEP CANNOT BE AUTOMATED. A TECHNICIAN MUST DO IT BY HAND.
+>
+> The App Control layer is fully scripted. **Adding the website list to ESET is not, and cannot be** — ESET exposes
+> no scriptable interface for its URL list, and this project deliberately does not guess at ESET's configuration
+> XML. The tool generates the file, copies it to the clipboard and opens ESET for you.
+>
+> **A technician must complete every step below by hand. Do not skip it and do not assume it happened** — the tool
+> cannot verify it. Until it is done, the tools' download sites and web consoles are **not** blocked.
 
 This takes about a minute.
 
@@ -19,12 +24,15 @@ You are pasting that list into ESET now.
 
 ## Steps
 
-Wording differs slightly between ESET versions.
+Wording differs slightly between ESET versions. **Every step below is performed by hand.**
 
-1. Press **F5** to open Advanced setup.
-2. Click **Protections** → **Web access protection**.
-3. Open **URL list management**, then next to **Address list** click **Edit**.
-4. **Make your own list** so that undo is one click later:
+**1.** **Press `F5`** to open **Advanced setup**.
+
+**2.** Click **Protections** → **Web access protection**.
+
+**3.** Open **URL list management**, then next to **Address list** click **Edit**.
+
+**4.** **Make your own list** so that undo is one click later:
    - click **Add** — in the *Address list* window, **not** inside an existing list;
    - address list type: **Blocked**;
    - name: `RMM scam block (lolrmm)`;
@@ -32,25 +40,29 @@ Wording differs slightly between ESET versions.
 
    > If your ESET has no **Add** button here, use ESET's built-in **List of blocked addresses** → **Edit**
    > instead. Undo then takes more work — see [Undo](#undo) below.
-5. Inside that list, click **Add** → tick **Enter multiple values**.
-6. Click in the box, press **Ctrl+V** to paste the whole list, click **OK**.
-   *Or* use the **Import** button and choose `eset-blocked-urls.txt` in the folder that opened.
-7. Click **OK** on every window, then **OK** in Advanced setup to save.
 
-### Block the programs too (step 8)
+**5.** Inside that list, click **Add** → tick **Enter multiple values**.
+
+**6.** **Click in the box, press `Ctrl+V`** to paste the whole list, then click **OK**.
+   *Or* use the **Import** button and choose `eset-blocked-urls.txt` in the folder that opened.
+
+**7.** Click **OK** on every window, then **OK** in Advanced setup to save.
+
+### Block the programs too (step 8) — **by hand**
 
 App Control already blocks them by signature. This ESET toggle is the backstop for tools that are unsigned or that
 ESET already knows about:
 
-8. In Advanced setup, type `unsafe` in the search box and turn **ON** *"Enable detection of potentially unsafe
-   applications"*. Click **OK**.
+**8.** In Advanced setup, **type `unsafe`** in the search box and turn **ON** *"Enable detection of potentially
+   unsafe applications"*. Click **OK**.
 
 ESET then flags known remote-access tools as soon as they are saved or opened. If it flags Splashtop or another
 tool you use on purpose, open the detection and choose **Create exclusion**.
 
-## Test it
+## Test it — **by hand**
 
-Open a browser and go to `anydesk.com`. ESET should show its "page blocked" message.
+**Open a browser and go to `anydesk.com`.** ESET should show its **"page blocked"** message. If the page loads
+normally, the paste did not take — repeat steps 1–7.
 
 ## Undo
 

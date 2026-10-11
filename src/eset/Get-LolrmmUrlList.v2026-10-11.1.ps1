@@ -80,7 +80,11 @@ $ProtectedRoot = @(
 )
 
 if (-not $OutDir) {
-    $OutDir = Join-Path $env:USERPROFILE ('LOLRMM-UrlList\' + (Get-Date -Format 'yyyy-MM-dd_HHmmss'))
+    # USERPROFILE may be unset (service accounts, some elevated/RDP contexts). Falling back
+    # to a folder beside this script is better than throwing: the output folder is the thing
+    # the operator is looking for, so it must not be the thing that fails.
+    $base = if ($env:USERPROFILE) { $env:USERPROFILE } else { $PSScriptRoot }
+    $OutDir = Join-Path $base ('LOLRMM-UrlList\' + (Get-Date -Format 'yyyy-MM-dd_HHmmss'))
 }
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 Write-Host "Get-LolrmmUrlList v$ScriptVersion  ->  $OutDir"

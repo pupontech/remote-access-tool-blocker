@@ -1,5 +1,14 @@
-BLOCK REMOTE-ACCESS SCAM TOOLS IN ESET  -  last few minutes, done by hand
-=====================================================================
+MUST BE DONE BY HAND BY A TECHNICIAN  -  BLOCK REMOTE-ACCESS SCAM TOOLS IN ESET
+==============================================================================
+
+THIS STEP CANNOT BE AUTOMATED. The BLOCK button does everything else itself, but it
+cannot add this list to ESET: ESET's URL list is a GUI import/paste with no scriptable
+interface, and this project deliberately does not guess at ESET's configuration XML.
+A TECHNICIAN MUST COPY/PASTE IT BY HAND, following the steps below.
+
+Do not skip this step and do not assume it happened. Until it is done, the ESET website
+layer is NOT active - the programs are still blocked by Windows App Control, but the
+tools' download sites and web consoles are not.
 
 The BLOCK button (START-HERE.bat) has already:
   - built the block list (about 400 remote-access tool websites)
@@ -71,3 +80,6 @@ GOOD TO KNOW
     those if this person doesn't use them.
   - This blocks the download sites and web consoles. A tool that is already
     installed may still connect - uninstall any remote tool you don't recognise.
+
+REMINDER: EVERY ACTION IN THIS FILE IS DONE BY HAND. If nobody pasted the list into
+ESET, the ESET website part of the block is still not in place.

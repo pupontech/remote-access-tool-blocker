@@ -4,6 +4,43 @@ All notable changes to this project. Dates are the versioning dates carried in t
 
 ## Unreleased
 
+### Fixed: the ESET list did not appear to arrive
+
+Two independent defects, either of which alone makes the list look like it vanished.
+
+**1. The window could die before it ever appeared.** The output-folder line ran at script scope with
+`$ErrorActionPreference = 'Stop'`:
+
+```powershell
+$UrlOut = Join-Path $env:USERPROFILE 'LOLRMM-UrlList\latest'
+```
+
+If `USERPROFILE` is unset (service accounts, some elevated/RDP contexts) that throws — and it sits **before** the
+form is constructed and before BLOCK is wired, so the window never opens and BLOCK appears to do nothing. The
+launcher starts the window hidden, so there is no visible error either. The folder is now resolved defensively and
+falls back to a folder beside the script.
+
+**2. The list was written somewhere nobody was told about, and the clipboard was assumed to work.** The window
+printed "list copied to the clipboard" without checking, and never disclosed where the file was. `Set-Clipboard`
+returns nothing and can fail or write to a *different* session's clipboard when the process runs elevated — so the
+success message could be false while `eset-blocked-urls.txt` sat in an unmentioned folder. Now it:
+
+- **always prints the import file path** and the entry count in the window,
+- **reads the clipboard back** and only claims success when the contents actually match,
+- when the clipboard fails, says so and points at the file: *"in ESET choose Import and pick that
+  eset-blocked-urls.txt file"*,
+- and reports each failure mode distinctly instead of collapsing them: generator not found (with the folder it
+  searched), generator failed, generator ran but produced no file.
+
+**Also guarded `$env:USERPROFILE` in both ESET generators** (`Get-LolrmmUrlList`, `Get-LolrmmHipsList`), which threw
+on a default run without it; they now fall back to a folder beside the script.
+
+Verified by running the real generator the way the window invokes it: 406 entries at the announced path, no BOM,
+`anydesk.com` present, an excluded tool genuinely absent, `-OutDir` honoured on repeat runs, and a default run
+without `USERPROFILE` falling back instead of crashing.
+
+## 2026.10.11
+
 ### Windows-only kit: its removal tool no longer has the ESET part
 
 The Windows-only kit installs no ESET layer, but the shared revert tool unconditionally opened ESET, printed ESET
