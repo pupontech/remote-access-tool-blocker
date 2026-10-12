@@ -51,14 +51,14 @@ trap 'rm -rf "$FULL_STAGE"' EXIT
 mkdir -p "$FULL_STAGE/1" "$FULL_STAGE/2" "$FULL_STAGE/1/policy"
 
 # program 1 - App Control only. The WinOnly revert variant gives it an ESET-FREE undo tool.
-cp kits/1/Block-The-Programs.bat                      "$FULL_STAGE/1/"
+cp kits/1/START-HERE.bat                              "$FULL_STAGE/1/"
 cp "$P1"                                              "$FULL_STAGE/1/"
 cp "$APP_BUILD" "$APP_INST" src/appcontrol/Run-RmmAppControl.bat "$FULL_STAGE/1/"
 cp "$REV_WIN" revert/Run-Revert.bat                   "$FULL_STAGE/1/"
 cp -r policy/. "$FULL_STAGE/1/policy/"
 
 # program 2 - the ESET website list, plus the ESET-aware undo tool and its guide.
-cp kits/2/Block-The-Websites.bat                      "$FULL_STAGE/2/"
+cp kits/2/START-HERE.bat                              "$FULL_STAGE/2/"
 cp "$P2" "$URLGEN" "$HIPSGEN"                         "$FULL_STAGE/2/"
 cp src/eset/HOW-TO-IMPORT.txt src/eset/Run-LolrmmUrlList.bat src/eset/Run-LolrmmHipsList.bat "$FULL_STAGE/2/"
 cp "$REV_INST" "$REV_FULL" revert/Run-Revert.bat      "$FULL_STAGE/2/"
@@ -69,7 +69,7 @@ cp "$GUIDE" "$FULL_STAGE/2/revert-docs/"
 WIN_STAGE=$(mktemp -d)
 trap 'rm -rf "$FULL_STAGE" "$WIN_STAGE"' EXIT
 mkdir -p "$WIN_STAGE/policy"
-cp kits/windows-only/Remote-Tools-Block-Windows.bat "$WIN_STAGE/"
+cp kits/windows-only/START-HERE.bat                   "$WIN_STAGE/"
 cp "$(pick 'Remote-Tools-Block-Windows.v*.ps1' kits/windows-only/Remote-Tools-Block-Windows.v*.ps1)" "$WIN_STAGE/"
 cp "$APP_BUILD" "$APP_INST" src/appcontrol/Run-RmmAppControl.bat "$WIN_STAGE/"
 cp "$REV_WIN" revert/Run-Revert.bat                   "$WIN_STAGE/"
@@ -88,7 +88,7 @@ make_zip "$WIN_ZIP"  "$WIN_STAGE"
 # ---------------------------------------------------------------- contracts on the REAL output
 fail=0
 full_list=$(unzip -Z1 "$FULL_ZIP")
-for f in 1/Block-The-Programs.bat 2/Block-The-Websites.bat; do
+for f in 1/START-HERE.bat 2/START-HERE.bat; do
     echo "$full_list" | grep -qx "$f" || { echo "ERROR: $f missing from the full kit"; fail=1; }
 done
 # program 1 must be ESET-free and must NOT carry the full variant or a guide

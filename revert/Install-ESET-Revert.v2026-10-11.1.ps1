@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
   Program 2 helper - install the standalone ESET-aware revert tool to C:\RemoteAccessToolBlocker.
-  Run for you by Block-The-Websites.bat the first time it builds a list; can also be run by hand.
+  Run for you by START-HERE.bat (folder 2) the first time it builds a list; can also be run by hand.
 
 .DESCRIPTION
   Program 1 installs its own undo tool (App Control removal only). This is the OTHER half: the undo tool that

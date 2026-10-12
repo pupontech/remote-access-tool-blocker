@@ -91,9 +91,9 @@ jobs:
         run: |
           $fail = @()
           $expect = @{
-            'kits/1/Block-The-Programs.bat'                           = 'Block-The-Programs.v*.ps1'
-            'kits/2/Block-The-Websites.bat'                           = 'Block-The-Websites.v*.ps1'
-            'kits/windows-only/Remote-Tools-Block-Windows.bat'        = 'Remote-Tools-Block-Windows.v*.ps1'
+            'kits/1/START-HERE.bat'                                   = 'Block-The-Programs.v*.ps1'
+            'kits/2/START-HERE.bat'                                   = 'Block-The-Websites.v*.ps1'
+            'kits/windows-only/START-HERE.bat'                        = 'Remote-Tools-Block-Windows.v*.ps1'
             'src/appcontrol/Run-RmmAppControl.bat'                    = 'Install-RmmAppControl.v*.ps1'
             'src/eset/Run-LolrmmUrlList.bat'                          = 'Get-LolrmmUrlList.v*.ps1'
             'src/eset/Run-LolrmmHipsList.bat'                         = 'Get-LolrmmHipsList.v*.ps1'

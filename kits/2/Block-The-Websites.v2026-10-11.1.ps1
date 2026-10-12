@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Program 2 - block the remote-access tools' WEBSITES in ESET. Launched by Block-The-Websites.bat.
+  Program 2 - block the remote-access tools' WEBSITES in ESET. Launched by START-HERE.bat.
   Builds the ESET "List of blocked addresses" import file, copies it to the clipboard, opens ESET and the guide.
 
 .DESCRIPTION

@@ -4,6 +4,24 @@ All notable changes to this project. Dates are the versioning dates carried in t
 
 ## Unreleased
 
+### Changed: every launcher a person double-clicks is now `START-HERE.bat`
+
+Each program's entry point was named after what it did (`Block-The-Programs.bat`,
+`Block-The-Websites.bat`, `Remote-Tools-Block-Windows.bat`), which left the operator to work out which file to
+open. All three are now **`START-HERE.bat`**, so the answer is the same in every folder:
+
+| Folder | Double-click this |
+|---|---|
+| `1\` | `START-HERE.bat` |
+| `2\` | `START-HERE.bat` |
+| the Windows-only kit | `START-HERE.bat` |
+
+The name is unambiguous because the programs live in separate folders, and the elevation relaunch uses `%~f0`, so
+the launchers were already rename-safe. The helper launchers that code calls by name (`Run-RmmAppControl.bat`,
+`Run-Revert.bat`, `Run-LolrmmUrlList.bat`) are **unchanged** — renaming those would break the scripts that invoke
+them. The scripts and docs that named the old launchers were updated, and the CI launcher contract now asserts
+`kits/*/START-HERE.bat`.
+
 ### Fixed: program 1 no longer hands out ESET removal steps
 
 The split exposed a real defect. Program 1 shipped the *shared* revert tool, and `Install-RmmAppControl` installs
@@ -39,8 +57,8 @@ It is now two independent programs:
 
 | Folder | Program | What it does | Needs |
 |---|---|---|---|
-| **`1\`** | `Block-The-Programs.bat` | Blocks the remote-access **programs** with Windows App Control | Administrator. No antivirus. |
-| **`2\`** | `Block-The-Websites.bat` | Builds the **website** list, copies it, opens ESET + the paste guide | **ESET installed.** No admin. |
+| **`1\`** | `START-HERE.bat` | Blocks the remote-access **programs** with Windows App Control | Administrator. No antivirus. |
+| **`2\`** | `START-HERE.bat` | Builds the **website** list, copies it, opens ESET + the paste guide | **ESET installed.** No admin. |
 
 - **Neither program needs the other.** Program 1 never mentions ESET; program 2 never touches App Control, needs no
   administrator rights and cannot alter the machine's protection.

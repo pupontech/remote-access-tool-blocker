@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
   Program 1 - block the remote-access scam PROGRAMS on this PC with Windows App Control.
-  Launched by Block-The-Programs.bat (elevated). No antivirus needed, no ESET involved.
+  Launched by START-HERE.bat (elevated). No antivirus needed, no ESET involved.
 
 .DESCRIPTION
   BLOCK   Windows App Control: installs policy\RmmBlock-Enforce.cip (builds it first if missing and this PC can)
@@ -26,7 +26,7 @@ $Here = $PSScriptRoot
 
 # ------------------------------------------------------------------ parts
 # Repro layout (see README "Repository layout"):
-#   kits/1/            this window + Block-The-Programs.bat  (the program blocker)
+#   kits/1/            this window + START-HERE.bat  (the program blocker)
 #   kits/2/            the ESET website list program
 #   src/appcontrol/    Build- / Install- / Run-RmmAppControl   (ONE shared copy)
 #   policy/            the prebuilt .cip / .xml policies (shared, at the repo root)
@@ -259,7 +259,7 @@ $btnLog.Add_Click({
 })
 
 # ---------------------------------------------------------------- start
-if (-not $isAdmin) { Say 'Not running as administrator - BLOCK / UNDO will fail. Start this from Block-The-Programs.bat.' }
+if (-not $isAdmin) { Say 'Not running as administrator - BLOCK / UNDO will fail. Start this from START-HERE.bat.' }
 Say 'BLOCK  = block the remote-access PROGRAMS on this PC (no antivirus needed).'
 Say 'UNDO   = remove the program block (restart after).'
 Say 'Test mode = log only, nothing blocked - for trying it out first.'

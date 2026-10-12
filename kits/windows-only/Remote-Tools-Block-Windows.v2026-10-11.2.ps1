@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
   Remote Tools Block (Windows) - one window to BLOCK / UNDO remote-access scam tools on this PC with Windows
-  App Control only (no ESET, no antivirus needed). Launched by Remote-Tools-Block-Windows.bat (elevated).
+  App Control only (no ESET, no antivirus needed). Launched by START-HERE.bat (elevated).
 
 .DESCRIPTION
   BLOCK      installs policy\variants\RmmBlock-Enforce-<toggles>.cip -> AnyDesk, TeamViewer, ScreenConnect and ~50
@@ -238,7 +238,7 @@ $btnLog.Add_Click({
 })
 
 # ---------------------------------------------------------------- start
-if (-not $isAdmin) { Say 'Not running as administrator - BLOCK / UNDO will fail. Start this from Remote-Tools-Block-Windows.bat.' }
+if (-not $isAdmin) { Say 'Not running as administrator - BLOCK / UNDO will fail. Start this from START-HERE.bat.' }
 Say 'BLOCK     = block the remote-access programs on this PC.'
 Say 'UNDO      = remove the block (restart after).'
 Say 'Test mode = log only, nothing blocked - for trying it out first.'

@@ -34,8 +34,8 @@ The full kit is **two separate programs**, in two folders:
 
 | Folder | Program | What it does | Needs |
 |---|---|---|---|
-| **`1\`** | `Block-The-Programs.bat` | Blocks the remote-access **programs** (AnyDesk, TeamViewer, ScreenConnect …) with Windows App Control | Administrator. No antivirus. |
-| **`2\`** | `Block-The-Websites.bat` | Builds the list of the tools' **websites** and opens ESET + the paste guide | **ESET installed.** No admin needed. |
+| **`1\`** | `START-HERE.bat` | Blocks the remote-access **programs** (AnyDesk, TeamViewer, ScreenConnect …) with Windows App Control | Administrator. No antivirus. |
+| **`2\`** | `START-HERE.bat` | Builds the list of the tools' **websites** and opens ESET + the paste guide | **ESET installed.** No admin needed. |
 
 They are independent — run either one, or both. Neither needs the other.
 
@@ -43,10 +43,10 @@ They are independent — run either one, or both. Neither needs the other.
    - `remote-tools-block-windows-<version>.zip` — the program blocker only. No antivirus needed. **Start here.**
    - `full-kit-eset-<version>.zip` — both programs, as folders `1` and `2`.
 2. Extract it anywhere on the PC. Keep the folders together — the launchers find the scripts relative to themselves.
-3. **Program 1:** open folder **`1`**, double-click **`Block-The-Programs.bat`** and accept the administrator prompt.
+3. **Program 1:** open folder **`1`**, double-click **`START-HERE.bat`** and accept the administrator prompt.
 4. Tick or untick **TeamViewer / AnyDesk / Splashtop / RustDesk**. Ticked = blocked.
 5. Press **BLOCK**.
-6. **Program 2 (only if the PC runs ESET):** open folder **`2`**, double-click **`Block-The-Websites.bat`**, press
+6. **Program 2 (only if the PC runs ESET):** open folder **`2`**, double-click **`START-HERE.bat`**, press
    **BUILD**, then **paste the list into ESET BY HAND** — the program cannot do it and cannot verify it.
    See [The ESET paste](#the-eset-paste--must-be-done-by-hand-by-a-technician).
 
@@ -73,7 +73,7 @@ toggle is set to. **Refresh status** lists recent events: `[3077]` means a progr
 > not active — the programs are still blocked by Windows App Control, but the tools' download sites and web
 > consoles are not.
 
-**Before you start:** the **BUILD** button in program 2 (`2\Block-The-Websites.bat`) has already built the list and
+**Before you start:** the **BUILD** button in program 2 (`2\START-HERE.bat`) has already built the list and
 **copied it to your clipboard**. It also prints the **exact path of the import file** in the window, like this:
 
 ```
@@ -380,9 +380,9 @@ then restart. That removes the policy this project installed and nothing else.
 ```
 src/appcontrol/    Build- / Install- / Run-RmmAppControl   (ONE shared copy, used by both kits)
 src/eset/          Get-LolrmmUrlList  (website list)  and Get-LolrmmHipsList  (experimental path list)
-kits/1/            Block-The-Programs.bat + window   (PROGRAM 1: the App Control program blocker)
-kits/2/            Block-The-Websites.bat + window   (PROGRAM 2: the ESET website list)
-kits/windows-only/ Remote-Tools-Block-Windows.bat + window (App Control only, one window)
+kits/1/            START-HERE.bat + window   (PROGRAM 1: the App Control program blocker)
+kits/2/            START-HERE.bat + window   (PROGRAM 2: the ESET website list)
+kits/windows-only/ START-HERE.bat + window (App Control only, one window)
 revert/            Run-Revert.bat + Revert-RemoteAccessBlock (both variants) + Install-ESET-Revert
 policy/            the prebuilt policies - 32 toggle combinations + signers.csv (generated output)
 build/             build-release.sh - builds BOTH release ZIPs and asserts the 1\/2\ split on them
