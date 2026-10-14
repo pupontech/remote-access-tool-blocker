@@ -78,6 +78,15 @@ cp "$APP_BUILD" "$APP_INST" src/appcontrol/Run-RmmAppControl.bat "$WIN_STAGE/"
 cp "$REV_WIN" revert/Run-Revert.bat                   "$WIN_STAGE/"
 cp -r policy/. "$WIN_STAGE/policy/"
 
+# Alpha builds must say so inside the kit - a file sitting next to the scripts is the one
+# place an operator cannot miss, whatever they rename the folder.
+is_alpha=0
+if grep -qi 'alpha' VERSION; then
+    is_alpha=1
+    cp ALPHA-DO-NOT-USE.txt "$FULL_STAGE/ALPHA-DO-NOT-USE.txt"
+    cp ALPHA-DO-NOT-USE.txt "$WIN_STAGE/ALPHA-DO-NOT-USE.txt"
+fi
+
 # ---------------------------------------------------------------- zip (deterministic: fixed order, mtime)
 make_zip() {
     local out="$1" stage="$2"
@@ -110,6 +119,15 @@ echo "$full_list" | grep -qE '^2/Revert-RemoteAccessBlock\.v'   || { echo "ERROR
 echo "$full_list" | grep -q  '^2/revert-docs/eset-remove-guide.txt' || { echo "ERROR: folder 2 has no ESET guide"; fail=1; }
 if echo "$full_list" | grep -qE '^2/(Install-RmmAppControl|Build-RmmAppControl)'; then
     echo "ERROR: folder 2 contains App Control scripts"; fail=1
+fi
+if [ "$is_alpha" -eq 1 ]; then
+    for zipfile in "$FULL_ZIP" "$WIN_ZIP"; do
+        unzip -Z1 "$zipfile" | grep -qx 'ALPHA-DO-NOT-USE.txt' || { echo "ERROR: alpha zip $zipfile has no ALPHA-DO-NOT-USE.txt marker"; fail=1; }
+    done
+else
+    for zipfile in "$FULL_ZIP" "$WIN_ZIP"; do
+        unzip -Z1 "$zipfile" | grep -qx 'ALPHA-DO-NOT-USE.txt' && { echo "ERROR: $zipfile is not alpha but carries the alpha marker"; fail=1; }
+    done
 fi
 [ "$fail" -eq 0 ] || exit 1
 

@@ -42,6 +42,10 @@ They are independent — run either one, or both. Neither needs the other.
 1. Download the release ZIP you want:
    - `remote-tools-block-windows-<version>.zip` — the program blocker only. No antivirus needed. **Start here.**
    - `full-kit-eset-<version>.zip` — both programs, as folders `1` and `2`.
+   **Which release?** The release titled **"USE THIS - Stable ..."** is the one to run. A release with
+   **alpha** in the name is unfinished and must not be used on a client PC; its ZIP contains
+   `ALPHA-DO-NOT-USE.txt`.
+
 2. Extract it anywhere on the PC. Keep the folders together — the launchers find the scripts relative to themselves.
 3. **Program 1:** open folder **`1`**, double-click **`START-HERE.bat`** and accept the administrator prompt.
 4. **TeamViewer / AnyDesk / Splashtop / RustDesk start unticked** (allowed) on a fresh PC. Ticked = blocked. An existing program policy still loads its installed choices.

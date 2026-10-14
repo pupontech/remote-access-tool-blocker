@@ -128,6 +128,14 @@ Not covered: unsigned tools, and the catalogue entries that publish no certifica
 
 ## Installing
 
+### Refreshing the program list (program 1, alpha)
+
+`policy/` is built from the vendors' code-signing certificates, so it only changes when a vendor changes its
+signing chain. The kit ships the prebuilt variants, so no download happens at run time. Pressing **Refresh list**
+in program 1 rebuilds them from lolrmm.io on demand (`Build-RmmAppControl -IncludeOptional`); an already-installed
+policy keeps the old list until **BLOCK** or **Test mode** is pressed again. Rebuilding needs Windows
+Pro/Enterprise (it uses `ConvertFrom-CIPolicy`).
+
 `Install-RmmAppControl` has four modes: `Enforce`, `Audit`, `Remove`, `Status` (the default).
 
 - On **Windows 11 22H2 and later** it uses `CiTool.exe --update-policy`, which takes effect immediately.

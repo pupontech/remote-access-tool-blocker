@@ -5,6 +5,7 @@
 
 .DESCRIPTION
   BLOCK   Windows App Control: installs policy\RmmBlock-Enforce.cip (builds it first if missing and this PC can)
+  REFRESH LIST  Rebuilds the signer list from lolrmm.io on demand (needs Windows Pro), then press BLOCK again.
             -> AnyDesk, TeamViewer, ScreenConnect ... can't start, even renamed / from email / Downloads / USB.
   UNDO    Removes the App Control policy (restart to finish).
   TEST    Installs the policy in audit mode (logs only, blocks nothing).
@@ -19,7 +20,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$ScriptVersion = '2026.10.14.3'
+$ScriptVersion = '2026-10-15.0-alpha.1'
 $PolicyGuid = '{2D13BFB7-4304-4847-9CDD-37820D3EE9B7}'   # must match Build-/Install-RmmAppControl
 $bare = $PolicyGuid.Trim('{}').ToLowerInvariant()
 $Here = $PSScriptRoot
@@ -130,8 +131,19 @@ $log.Font = New-Object Drawing.Font('Consolas', 9)
 $form.Controls.Add($log)
 
 $btnLog = New-Object Windows.Forms.Button
-$btnLog.Text = 'Refresh status / show recent blocks'; $btnLog.Location = New-Object Drawing.Point(16, 528)
-$btnLog.Size = New-Object Drawing.Size(592, 30); $btnLog.Anchor = 'Bottom, Left'
+$btnLog.Text = 'Refresh status / show recent blocks'; $btnLog.Location = New-Object Drawing.Point(282, 528)
+$btnLog.Size = New-Object Drawing.Size(326, 30); $btnLog.Anchor = 'Bottom, Left'
+
+$btnRefresh = New-Object Windows.Forms.Button
+$btnRefresh.Text = 'Refresh list'; $btnRefresh.Location = New-Object Drawing.Point(16, 528)
+$btnRefresh.Size = New-Object Drawing.Size(250, 30); $btnRefresh.Anchor = 'Bottom, Left'
+$btnRefresh.Font = New-Object Drawing.Font('Segoe UI', 10)
+$form.Controls.Add($btnRefresh)
+
+function Confirm([string]$text, [string]$caption) {
+    # Wrapped so the answer can be driven by tests without a real dialog on screen.
+    return ([Windows.Forms.MessageBox]::Show($text, $caption, 'YesNo', 'Question') -eq 'Yes')
+}
 $form.Controls.Add($btnLog)
 
 function Say([string]$m, [string]$color = '') {
@@ -160,7 +172,7 @@ function Run-Script([string]$path, [string[]]$scriptArgs) {
     return $rc
 }
 function Busy([bool]$on) {
-    foreach ($b in $btnDo, $btnUndo, $btnTest, $btnLog) { $b.Enabled = -not $on }
+    foreach ($b in $btnDo, $btnUndo, $btnTest, $btnLog, $btnRefresh) { $b.Enabled = -not $on }
     $form.Cursor = $(if ($on) { 'WaitCursor' } else { 'Default' }); [Windows.Forms.Application]::DoEvents()
 }
 
@@ -275,11 +287,42 @@ $btnLog.Add_Click({
     Update-Status; Busy $false
 })
 
+$btnRefresh.Add_Click({
+    if (-not (Confirm ('Rebuild the program block list from lolrmm.io now?' + "`r`n`r`n" +
+        'This downloads the current catalogue and writes new policy files into the kit (about a minute).' + "`r`n`r`n" +
+        'It needs Windows Pro/Enterprise. After it finishes, press BLOCK (or Test mode) again to install the new list.') 'Refresh list')) { return }
+    Busy $true; $log.Clear()
+    try {
+        Say '=== REFRESH LIST ==='
+        $build = Find-Newest 'Build-RmmAppControl.v*.ps1' $Parts.AppControl
+        if (-not $build) {
+            Say '  Build-RmmAppControl.v*.ps1 is missing from this folder.' 'Red'
+        } elseif (-not (Get-Command ConvertFrom-CIPolicy -ErrorAction SilentlyContinue)) {
+            Say '  This PC cannot rebuild the list (Windows Pro/Enterprise only).' 'Red'
+            Say '  Build it on a Pro PC with Build-RmmAppControl -IncludeOptional, then copy the policy folder into the kit.' 'Yellow'
+        } else {
+            Say '  Building from lolrmm.io (about a minute) ...'
+            if ((Run-Script $build @('-IncludeOptional')) -eq 0) {
+                Say '  -> list rebuilt. Press BLOCK (or Test mode) again to install the new list.' 'Green'
+                Say '     Already-installed policies keep the OLD list until you do.' 'Yellow'
+            } else {
+                Say '  -> rebuild failed - see the lines above. The policy folder is unchanged unless the build wrote partial files.' 'Red'
+            }
+        }
+    } catch {
+        # Name where it died so a cosmetic failure is not mistaken for a real one.
+        Say ('ERROR: ' + $_.Exception.Message) 'Red'
+        Say ('       at line ' + $_.InvocationInfo.ScriptLineNumber + ': ' + $_.InvocationInfo.Line.Trim())
+    }
+    Update-Status; Busy $false
+})
+
 # ---------------------------------------------------------------- start
 if (-not $isAdmin) { Say 'Not running as administrator - BLOCK / UNDO will fail. Start this from START-HERE.bat.' }
 Say 'BLOCK  = block the remote-access PROGRAMS on this PC (no antivirus needed).'
 Say 'UNDO   = remove the program block (restart after).'
 Say 'Test mode = log only, nothing blocked - for trying it out first.'
+Say 'Refresh list = rebuild the block list from lolrmm.io, then press BLOCK to install it.'
 Say 'Ticks = TeamViewer / AnyDesk / Splashtop / RustDesk blocked or allowed. Change them, then press BLOCK to apply.'
 Say ''
 Say 'The websites are a separate program: folder "2". Some PCs (Windows Home) cannot build the'

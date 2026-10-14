@@ -20,7 +20,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$ScriptVersion = '2026.10.14.3'
+$ScriptVersion = '2026.10.15.0-alpha.1'
 $Here = $PSScriptRoot
 
 # Where the generated ESET import file goes. Resolved defensively: an unguarded Join-Path here would kill the
