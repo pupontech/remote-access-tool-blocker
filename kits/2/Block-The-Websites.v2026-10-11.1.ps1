@@ -1,14 +1,14 @@
 <#
 .SYNOPSIS
   Program 2 - block the remote-access tools' WEBSITES in ESET. Launched by START-HERE.bat.
-  Builds the ESET "List of blocked addresses" import file, copies it to the clipboard, opens ESET and the guide.
+  Builds the ESET "List of blocked addresses" import file, copies its file path to the clipboard, opens ESET and the guide.
 
 .DESCRIPTION
-  This is the WEBSITE half of the kit. It only builds a list and shows it to you: the paste into ESET is a manual
+  This is the WEBSITE half of the kit. It only builds a list and shows it to you: the import into ESET is a manual
   step and this program cannot do it or verify it.
 
-  BUILD   Downloads the LOLRMM catalogue, writes eset-blocked-urls.txt (~406 masks), copies it to the clipboard
-          (and verifies the copy), opens the folder with the file selected, then opens ESET + HOW-TO-IMPORT.txt.
+  BUILD   Downloads the LOLRMM catalogue, writes eset-blocked-urls.txt (one combined file), copies its file path to the clipboard
+          (and verifies the path copy), opens the folder with the file selected, then opens ESET + HOW-TO-IMPORT.txt.
   OPEN    Reopens the folder holding the list, without rebuilding it - for when you need the file again.
   Checkboxes: TeamViewer / AnyDesk / Splashtop / RustDesk - an UNTICKED tool is left out of the website list, so a
   tool your client legitimately uses is not blocked on the web.
@@ -20,7 +20,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$ScriptVersion = '2026-10-11.1'
+$ScriptVersion = '2026-10-14.1-test'
 $Here = $PSScriptRoot
 
 # Where the generated ESET import file goes. Resolved defensively: an unguarded Join-Path here would kill the
@@ -84,7 +84,7 @@ function New-Btn([string]$text, [int]$x, [int]$w, [string]$color) {
     $form.Controls.Add($b); return $b
 }
 $grp = New-Object Windows.Forms.GroupBox
-$grp.Text = 'Leave these OUT of the website list (untick = allowed on this PC):'
+$grp.Text = 'Block these websites (untick = allowed on this PC):'
 $grp.Location = New-Object Drawing.Point(16, 84); $grp.Size = New-Object Drawing.Size(592, 52)
 $form.Controls.Add($grp)
 function New-Chk([string]$text, [int]$x, [bool]$on) {
@@ -92,17 +92,17 @@ function New-Chk([string]$text, [int]$x, [bool]$on) {
     $c.Text = $text; $c.Checked = $on; $c.Location = New-Object Drawing.Point($x, 20); $c.AutoSize = $true
     $grp.Controls.Add($c); return $c
 }
-# same defaults as program 1: block the tool = block its website; Splashtop is allowed.
-$chkT = New-Chk 'TeamViewer' 12 $true
-$chkA = New-Chk 'AnyDesk' 170 $true
+# All four tools are allowed by default, matching a fresh program 1 window.
+$chkT = New-Chk 'TeamViewer' 12 $false
+$chkA = New-Chk 'AnyDesk' 170 $false
 $chkS = New-Chk 'Splashtop' 310 $false
-$chkR = New-Chk 'RustDesk' 450 $true
+$chkR = New-Chk 'RustDesk' 450 $false
 
 $btnDo = New-Btn 'BUILD the list' 16 300 'PaleGreen'
 $btnFolder = New-Btn 'Open the list folder' 326 282 'LightSteelBlue'
 $btnFolder.Font = New-Object Drawing.Font('Segoe UI', 10)
 
-$log = New-Object Windows.Forms.TextBox
+$log = New-Object Windows.Forms.RichTextBox
 $log.Multiline = $true; $log.ScrollBars = 'Vertical'; $log.ReadOnly = $true; $log.WordWrap = $true
 $log.Location = New-Object Drawing.Point(16, 218); $log.Size = New-Object Drawing.Size(592, 340)
 $log.Anchor = 'Top, Bottom, Left, Right'
@@ -110,14 +110,21 @@ $log.Font = New-Object Drawing.Font('Consolas', 9)
 $form.Controls.Add($log)
 
 function Say([string]$m, [string]$color = '') {
+    # RichTextBox, NOT TextBox: SelectionColor (the colouring below) is a RichTextBox property only.
+    # With a plain TextBox the first coloured line throws "The property 'SelectionColor' cannot be
+    # found on this object" and kills the run - the generator had already succeeded, so the list
+    # looked like it had failed.
     $log.AppendText($m + "`r`n")
     if ($color) {
-        $n = $log.TextLength
-        $log.SelectionStart = $n - $m.Length - 2
-        $log.SelectionLength = $m.Length
-        $log.SelectionColor = [Drawing.Color]::FromName($color)
-        $log.SelectionStart = $n
-        $log.SelectionLength = 0
+        # colour is a nicety, never load-bearing: if the control cannot colour, still print the line.
+        try {
+            $n = $log.TextLength
+            $log.SelectionStart = $n - $m.Length - 2
+            $log.SelectionLength = $m.Length
+            $log.SelectionColor = [Drawing.Color]::FromName($color)
+            $log.SelectionStart = $n
+            $log.SelectionLength = 0
+        } catch { }
     }
     [Windows.Forms.Application]::DoEvents()
 }
@@ -155,7 +162,7 @@ function Open-EsetAndGuide {
 function Update-Status {
     if (Test-Path -LiteralPath $UrlListFile) {
         $n = @(Get-Content -LiteralPath $UrlListFile).Count
-        $status.Text = "Status: a list of $n entries is ready at $UrlOut`r`nPaste it into ESET by hand (press BUILD to rebuild)."
+        $status.Text = "Status: a list of $n entries is ready at $UrlOut`r`nImport it into ESET by hand (press BUILD to rebuild)."
         $status.ForeColor = [Drawing.Color]::DarkGreen
     } else {
         $status.Text = 'Status: no list built yet - press BUILD.'
@@ -189,47 +196,56 @@ $btnDo.Add_Click({
             # windows can own a different clipboard), and without this the list is written to a path nobody
             # was ever told about.
             Say ''
-            Say ('  IMPORT FILE: ' + $UrlListFile) 'White'
-            Say ('  (' + $lines.Count + ' entries)') 'White'
+            Say ('  IMPORT FILE: ' + $UrlListFile) 'DarkBlue'
+            Say ('  (' + $lines.Count + ' entries)') 'DarkBlue'
 
             $clipOk = $false
             try {
-                Set-Clipboard -Value $lines -ErrorAction Stop
+                Set-Clipboard -Value $UrlListFile -ErrorAction Stop
                 # read it back: Set-Clipboard returns nothing, so verify rather than assume
-                $back = @(Get-Clipboard -ErrorAction Stop)
-                $clipOk = ($back.Count -ge $lines.Count -and $back[0] -eq $lines[0])
+                $back = Get-Clipboard -Raw -ErrorAction Stop
+                $clipOk = ($back.TrimEnd("`r", "`n") -eq $UrlListFile)
             } catch { $clipOk = $false }
 
             if ($clipOk) {
-                Say '  -> list copied to the clipboard (verified) and opening ESET ...' 'Green'
+                Say '  -> import FILE PATH copied to the clipboard (verified).' 'Green'
             } else {
-                Say '  -> could NOT copy to the clipboard, so use the file instead:' 'Red'
+                Say '  -> could NOT copy the file path to the clipboard. Browse to:' 'Red'
                 Say '     in ESET choose Import and pick eset-blocked-urls.txt.' 'Yellow'
             }
-            Say '  Tip: paste it into a NEW list named "RMM scam block (lolrmm)" so UNDO is one click.'
+            Say '  Tip: import it into a NEW list named "RMM scam block (lolrmm)" so UNDO is one click.'
+            Open-ListFolder $true
+            Say '  One combined list. Review url-review.csv: it includes AV, SaaS and VPN domains.' 'Yellow'
             # Install the ESET-aware undo tool now that this PC actually has an ESET layer. Program 1
             # installs its own (App Control only) undo tool; this one adds the ESET removal steps.
             $instEset = Find-Newest 'Install-ESET-Revert.v*.ps1' $Parts.Eset
             if ($instEset) {
                 Say ''
                 Say '  Installing the undo tool (removes the list from ESET later) ...'
-                [void](Run-Script $instEset @())
+                try {
+                    if ((Run-Script $instEset @()) -ne 0) { Say '  Undo installer failed; the import list is still ready.' 'Yellow' }
+                } catch { Say ('  Undo installer failed: ' + $_.Exception.Message + '. The import list is still ready.') 'Yellow' }
             } else {
                 Say '  (the undo-tool installer Install-ESET-Revert.v*.ps1 was not found - the list can still be' 'Yellow'
                 Say '   removed by hand in ESET; run this program again from the full kit to install the tool.)' 'Yellow'
             }
-            Open-ListFolder $true
-            Open-EsetAndGuide
+            try { Open-EsetAndGuide } catch { Say ('  Could not open ESET/guide: ' + $_.Exception.Message) 'Yellow' }
             Say ''
             Say 'LAST STEP (by hand): in ESET press F5 and follow the guide in Notepad -'
             if ($clipOk) {
-                Say 'click "Enter multiple values" and press Ctrl+V, then OK -> OK.'
+                Say 'click Import, paste the copied FILE PATH into File name, then Open -> OK.'
             } else {
                 Say ('click Import and choose: ' + $UrlListFile)
             }
             Say ('  [log] ESET import file: ' + $UrlListFile + ' (' + $lines.Count + ' entries, clipboard=' + $clipOk + ')')
         }
-    } catch { Say "ERROR: $($_.Exception.Message)" }
+    } catch {
+        # Name where it died: the owner's "not copied to clipboard" was really this handler firing on an
+        # earlier line, which skipped the clipboard step entirely and made the list look broken.
+        Say ('ERROR: ' + $_.Exception.Message) 'Red'
+        Say ('       at line ' + $_.InvocationInfo.ScriptLineNumber + ': ' + $_.InvocationInfo.Line.Trim())
+        Say '       the list file may still be on disk - press "Open the list folder" to check.'
+    }
     Update-Status; Busy $false
 })
 
@@ -248,9 +264,9 @@ $btnFolder.Add_Click({
 })
 
 # ---------------------------------------------------------------- start
-Say 'BUILD = build the ESET website list and open ESET + the guide (the paste is a by-hand step).'
+Say 'BUILD = build the ESET website list and open ESET + the guide (the import is a by-hand step).'
 Say 'Unticked tools are left OUT of the list, so a tool your client uses is not blocked on the web.'
 Say ''
-Say 'Nothing here changes ESET by itself - you paste the list in by hand. See HOW-TO-IMPORT.txt.'
+Say 'Nothing here changes ESET by itself - you import the list by hand. See HOW-TO-IMPORT.txt.'
 Update-Status
 [void]$form.ShowDialog()

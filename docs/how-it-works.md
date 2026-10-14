@@ -166,12 +166,10 @@ Safety filters that keep it from breaking ordinary browsing:
 - The list does not accept raw IPs; those are written to `ips.txt` for reference only.
 
 `-ExtraDomain` adds download sites the catalogue only lists as a website — it has `*.net.anydesk.com` but not
-`anydesk.com`. `-ExcludeTool` and `-AllowDomain` leave a tool out entirely (Splashtop is excluded by default, for
-the same reason it is allowed in the policy).
+`anydesk.com`. `-ExcludeTool` and `-AllowDomain` leave a tool out entirely (TeamViewer, AnyDesk, Splashtop and RustDesk are excluded by default in the website generator; the two windows have independent choices).
 
 Entries that are remote-access related but also legitimately used — Sophos update servers, Freshchat widgets,
-Basecamp, Ninite, GoTo, Tailscale, ZeroTier, Zoho downloads — go to `eset-blocked-urls-optional.txt` for you to
-add per client.
+Basecamp, Ninite, GoTo, Tailscale, ZeroTier, Zoho downloads — are included in the single `eset-blocked-urls.txt` file and marked optional in `url-review.csv`. Review these and remove services the client needs before import.
 
 Two entries worth knowing about, both deliberate: `*.support.services.microsoft.com` blocks **Quick Assist** and
 `*.remotedesktop.google.com` blocks **Chrome Remote Desktop**. Both are heavily abused by scammers. If a client

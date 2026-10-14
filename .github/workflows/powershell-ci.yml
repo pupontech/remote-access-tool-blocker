@@ -189,11 +189,46 @@ jobs:
       - name: Two-program split contract (build + assert)
         shell: bash
         run: |
-          # zip is not preinstalled on windows-latest. Prefer a real zip; fall back to 7-Zip's
-          # zip-compatible mode, which the build script does not use - so if zip is absent, install it.
+          # zip is not preinstalled on windows-latest. If it is absent, install it rather than
+          # falling back to 7-Zip's incompatible modes.
           if ! command -v zip >/dev/null 2>&1; then
             choco install zip -y --no-progress || true
             export PATH="$PATH:/c/ProgramData/chocolatey/bin"
           fi
           zip -v >/dev/null 2>&1 || { echo "::error::zip is unavailable on this runner"; exit 1; }
           ./build/build-release.sh
+
+      # A window writes output with Say(), which colours lines via $log.SelectionColor - a RichTextBox-only
+      # property. It shipped once against a plain TextBox, so the FIRST coloured line threw "The property
+      # 'SelectionColor' cannot be found on this object" and aborted the rest of the run: the clipboard copy,
+      # the folder open and the ESET launch never happened, and the failure looked like the ESET list was
+      # broken. Catch that class of mismatch statically.
+      - name: WinForms control contract (SelectionColor needs RichTextBox)
+        run: |
+          $fail = @()
+          foreach ($f in (Get-ChildItem -Path 'kits' -Recurse -Filter '*.ps1' -File)) {
+            $text = Get-Content -Raw $f.FullName
+            if ($text -notmatch 'SelectionColor') { continue }
+            if ($text -match 'New-Object\s+Windows\.Forms\.TextBox') {
+              $fail += "$($f.Name): uses a TextBox but sets SelectionColor (RichTextBox-only property)"
+            }
+            if ($text -notmatch 'New-Object\s+Windows\.Forms\.RichTextBox') {
+              $fail += "$($f.Name): sets SelectionColor but never creates a RichTextBox"
+            }
+            # the colouring must be non-load-bearing: losing it may not abort the run
+            if ($text -notmatch '(?s)if \(\$color\) \{\s*(?:#[^\r\n]*\s*)*try \{') {
+              $fail += "$($f.Name): the colour block is not wrapped in try/catch - a cosmetic failure can abort the run"
+            }
+          }
+          if ($fail.Count -gt 0) { $fail | ForEach-Object { Write-Host "::error::$_" }; exit 1 }
+          Write-Host 'winforms control contract OK'
+
+      - name: Import workflow regressions (real WinForms and clipboard)
+        run: ./tests/Test-ImportWorkflow.ps1
+
+      - name: Upload test kit
+        if: matrix.shell == 'pwsh'
+        uses: actions/upload-artifact@v4
+        with:
+          name: blocker-import-test-kit
+          path: dist/full-kit-eset-*.zip*

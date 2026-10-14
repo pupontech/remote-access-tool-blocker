@@ -1,85 +1,42 @@
-MUST BE DONE BY HAND BY A TECHNICIAN  -  BLOCK REMOTE-ACCESS SCAM TOOLS IN ESET
-==============================================================================
+IMPORT THE WEBSITE LIST INTO ESET BY HAND
+========================================
 
-THIS STEP CANNOT BE AUTOMATED. The BLOCK button does everything else itself, but it
-cannot add this list to ESET: ESET's URL list is a GUI import/paste with no scriptable
-interface, and this project deliberately does not guess at ESET's configuration XML.
-A TECHNICIAN MUST COPY/PASTE IT BY HAND, following the steps below.
+Program 2 builds ONE combined import file: eset-blocked-urls.txt.
+BUILD opens its folder with the file selected and copies the FULL FILE PATH
+(not the website entries) to the clipboard, then opens ESET and this guide.
+If the clipboard is unavailable, the full path is printed in the program.
+Use "Open the list folder" to find the file again without rebuilding it.
 
-Do not skip this step and do not assume it happened. Until it is done, the ESET website
-layer is NOT active - the programs are still blocked by Windows App Control, but the
-tools' download sites and web consoles are not.
+TeamViewer, AnyDesk, Splashtop and RustDesk are UNTICKED by default in both
+programs. Unticked means allowed. Tick a tool before BUILD to include its
+websites. Program 1 is separate: its choices control the Windows program
+block, and it displays installed choices if a policy already exists.
 
-The BLOCK button (START-HERE.bat) has already:
-  - built the block list (about 400 remote-access tool websites)
-  - COPIED IT TO YOUR CLIPBOARD
-  - opened the ESET window
-  - blocked the remote-access PROGRAMS (Windows App Control)
+REVIEW BEFORE IMPORT: the combined file includes domains used legitimately
+for AV updates, SaaS and VPN services (Sophos, GoTo, Tailscale, Ninite, etc.).
+Review optional-tier rows in url-review.csv and remove anything the client
+needs from eset-blocked-urls.txt. Shared platform root filters remain active.
 
-Now in ESET (wording can differ slightly between versions):
+IN ESET (wording may differ by version):
+  1. Press F5 to open Advanced setup.
+  2. Protections -> Web access protection -> URL list management.
+  3. Next to Address list, click Edit.
+  4. Add a NEW address list of type Blocked, named RMM scam block (lolrmm).
+     Leave List active ticked. If unavailable, edit List of blocked addresses.
+  5. Inside that list, choose Import.
+  6. Paste the copied FILE PATH into the File name box (Ctrl+V), then Open.
+     If clipboard copy failed, browse to the file in the folder that opened.
+     Do NOT paste the path into "Enter multiple values": it is not a website.
+  7. OK on every window, then OK in Advanced setup to save.
 
-  1. Press F5  (opens Advanced setup)
-  2. Click  Protections  ->  Web access protection
-  3. Open  URL list management, then next to  Address list  click  Edit
-  4. Make OUR OWN list (so undo is one click later):
-       click  Add  (in the Address list window, NOT inside an existing list)
-       Address list type:  "Blocked"   Name:  RMM scam block (lolrmm)
-       keep "List active" ticked
-     (If your ESET has no Add button here, use "List of blocked addresses"
-      -> Edit instead - undo is then more work, see UNDO below.)
-  5. Inside that list click  Add  ->  tick  "Enter multiple values"
-  6. Click in the box, press  Ctrl+V  (pastes the whole list), click  OK
-       (Or use the Import button and choose the file
-        eset-blocked-urls.txt  in the folder that opened.)
-  7. Click  OK  on every window, then  OK  in Advanced setup to save.
+TEST: choose a website actually present in eset-blocked-urls.txt and visit
+it in a browser. ESET should block it. AnyDesk is NOT a valid default test:
+it is allowed unless its checkbox was ticked before building the list.
 
-  8. ALSO BLOCK THE PROGRAMS THEMSELVES (catches AnyDesk etc. sent by email,
-     saved to Downloads or a USB stick - not just the websites):
-       In Advanced setup, type  unsafe  in the search box, and turn ON
-       "Enable detection of potentially unsafe applications". Click OK.
-     ESET then flags known remote-access tools as soon as they are saved or
-     opened. If it flags Splashtop or another tool you use on purpose, open the
-     detection and choose "Create exclusion".
+UNDO: F5 -> Protections -> Web access protection -> URL list management ->
+Address list -> Edit. Select RMM scam block (lolrmm) and Remove, or untick
+List active. OK -> OK. Do not delete unrelated pre-existing blocked entries.
 
-TEST IT: open a browser and go to  anydesk.com
-  -> ESET should show a "page blocked" message.
-
-UNDO (website list) - F5 > Protections > Web access protection >
-  URL list management > Address list > Edit, then:
-  - our own list:  select "RMM scam block (lolrmm)" > Remove  (or untick
-    "List active" to switch it off but keep it) > OK > OK.   One click.
-  - if you pasted into ESET's built-in "List of blocked addresses" instead:
-    Edit it, click the FIRST entry, Shift+click the LAST, Remove > OK > OK.
-    (That list was empty before unless you added your own sites - check
-     before removing everything.)
-  Turning OFF step 8: search  unsafe  again and switch it off.
-
-WINDOWS APP CONTROL (the BLOCK / Test mode buttons)
-  Blocks ~50 remote-access vendors' programs by their digital signature
-  (AnyDesk, TeamViewer, ScreenConnect, UltraViewer, Supremo, AeroAdmin, ...),
-  even renamed or run from an email / Downloads / USB stick.
-  - Check it:  Run-RmmAppControl.bat            (shows installed + recent blocks)
-  - Undo it:   START-HERE.bat > UNDO   (or Run-RmmAppControl.bat -Mode Remove), then restart
-  - Test mode: Run-RmmAppControl.bat -Mode Audit    (logs only, blocks nothing)
-  - TeamViewer / AnyDesk / Splashtop / RustDesk: tick or untick them in the
-    START-HERE window, then press BLOCK. Default: TeamViewer, AnyDesk and
-    RustDesk blocked, Splashtop allowed. The same ticks decide the website list. (Blocking Splashtop also blocks OUR Splashtop on that PC.)
-  - A client uses another listed tool? Rebuild without it:
-      Build-RmmAppControl.v*.ps1 -ExcludeSigner "Vendor Name"
-    (vendor names are in policy\signers.csv), then install again.
-
-GOOD TO KNOW
-  - Splashtop and ESET's own sites are never in the ESET website list.
-  - Microsoft Quick Assist and Chrome Remote Desktop ARE blocked (scammers use
-    them a lot). If this person really uses one, remove these lines:
-      *.support.services.microsoft.com          (Quick Assist)
-      *.remotedesktop.google.com, *.remotedesktop-pa.googleapis.com,
-      *.chromoting-*.talkgadget.google.com      (Chrome Remote Desktop)
-  - eset-blocked-urls-optional.txt has extra entries that some people use
-    legitimately (Sophos updates, GoTo, Tailscale, Ninite...). Only add
-    those if this person doesn't use them.
-  - This blocks the download sites and web consoles. A tool that is already
-    installed may still connect - uninstall any remote tool you don't recognise.
-
-REMINDER: EVERY ACTION IN THIS FILE IS DONE BY HAND. If nobody pasted the list into
-ESET, the ESET website part of the block is still not in place.
+This program does NOT import into ESET automatically or verify the import.
+It does NOT apply the Windows program block. Use 1\START-HERE.bat for that.
+The two programs have independent checkboxes; set each one as required.

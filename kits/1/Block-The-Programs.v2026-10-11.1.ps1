@@ -19,7 +19,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$ScriptVersion = '2026-10-11.1'
+$ScriptVersion = '2026-10-14.1-test'
 $PolicyGuid = '{2D13BFB7-4304-4847-9CDD-37820D3EE9B7}'   # must match Build-/Install-RmmAppControl
 $bare = $PolicyGuid.Trim('{}').ToLowerInvariant()
 $Here = $PSScriptRoot
@@ -97,10 +97,10 @@ function New-Chk([string]$text, [int]$x, [bool]$on) {
     $c.Text = $text; $c.Checked = $on; $c.Location = New-Object Drawing.Point($x, 20); $c.AutoSize = $true
     $grp.Controls.Add($c); return $c
 }
-$chkT = New-Chk 'TeamViewer' 12 $true
-$chkA = New-Chk 'AnyDesk' 170 $true
+$chkT = New-Chk 'TeamViewer' 12 $false
+$chkA = New-Chk 'AnyDesk' 170 $false
 $chkS = New-Chk 'Splashtop' 310 $false
-$chkR = New-Chk 'RustDesk' 450 $true
+$chkR = New-Chk 'RustDesk' 450 $false
 $chkS.Add_Click({
     if ($chkS.Checked) {
         $r = [Windows.Forms.MessageBox]::Show(
@@ -122,7 +122,7 @@ $btnUndo = New-Btn 'UNDO' 256 170 'MistyRose'
 $btnTest = New-Btn 'Test mode' 436 172 'LightYellow'
 $btnTest.Font = New-Object Drawing.Font('Segoe UI', 10)
 
-$log = New-Object Windows.Forms.TextBox
+$log = New-Object Windows.Forms.RichTextBox
 $log.Multiline = $true; $log.ScrollBars = 'Vertical'; $log.ReadOnly = $true; $log.WordWrap = $true
 $log.Location = New-Object Drawing.Point(16, 218); $log.Size = New-Object Drawing.Size(592, 300)
 $log.Anchor = 'Top, Bottom, Left, Right'
@@ -137,14 +137,19 @@ $form.Controls.Add($btnLog)
 function Say([string]$m, [string]$color = '') {
     # colour is optional: 'Red'/'Yellow'/'Green' for the lines an operator must not miss.
     # The on-screen box is this window's output surface, so every line lands there too.
+    # RichTextBox, NOT TextBox: SelectionColor below is a RichTextBox property only, and with a
+    # plain TextBox the first coloured line throws and kills the run.
     $log.AppendText($m + "`r`n")
     if ($color) {
-        $n = $log.TextLength
-        $log.SelectionStart = $n - $m.Length - 2
-        $log.SelectionLength = $m.Length
-        $log.SelectionColor = [Drawing.Color]::FromName($color)
-        $log.SelectionStart = $n
-        $log.SelectionLength = 0
+        # colour is a nicety, never load-bearing: if the control cannot colour, still print the line.
+        try {
+            $n = $log.TextLength
+            $log.SelectionStart = $n - $m.Length - 2
+            $log.SelectionLength = $m.Length
+            $log.SelectionColor = [Drawing.Color]::FromName($color)
+            $log.SelectionStart = $n
+            $log.SelectionLength = 0
+        } catch { }
     }
     [Windows.Forms.Application]::DoEvents()
 }
@@ -219,7 +224,11 @@ $btnDo.Add_Click({
         $ok = Install-Policy 'Enforce'
         Say $(if ($ok) { '  -> programs blocked.' } else { '  -> FAILED - see the lines above.' })
         if ($ok) { Say 'Existing copies already running keep running - close them. New starts are blocked.' }
-    } catch { Say "ERROR: $($_.Exception.Message)" }
+    } catch {
+        # Name where it died so a cosmetic failure is not mistaken for a real one.
+        Say ('ERROR: ' + $_.Exception.Message) 'Red'
+        Say ('       at line ' + $_.InvocationInfo.ScriptLineNumber + ': ' + $_.InvocationInfo.Line.Trim())
+    }
     Update-Status; Busy $false
 })
 
@@ -236,7 +245,11 @@ $btnUndo.Add_Click({
         Say 'RESTART the PC to finish removing the program block.'
         Say 'This program only removes the program block. If the website list program (folder "2")'
         Say 'was also run on this PC, remove its list in your antivirus separately.'
-    } catch { Say "ERROR: $($_.Exception.Message)" }
+    } catch {
+        # Name where it died so a cosmetic failure is not mistaken for a real one.
+        Say ('ERROR: ' + $_.Exception.Message) 'Red'
+        Say ('       at line ' + $_.InvocationInfo.ScriptLineNumber + ': ' + $_.InvocationInfo.Line.Trim())
+    }
     Update-Status; Busy $false
 })
 
@@ -246,7 +259,11 @@ $btnTest.Add_Click({
         Say '=== TEST MODE (logs only, blocks nothing) ==='
         $ok = Install-Policy 'Audit'
         if ($ok) { Say ''; Say 'Now start AnyDesk/TeamViewer, then click "Refresh status" - it should list "[3076]" for it.' }
-    } catch { Say "ERROR: $($_.Exception.Message)" }
+    } catch {
+        # Name where it died so a cosmetic failure is not mistaken for a real one.
+        Say ('ERROR: ' + $_.Exception.Message) 'Red'
+        Say ('       at line ' + $_.InvocationInfo.ScriptLineNumber + ': ' + $_.InvocationInfo.Line.Trim())
+    }
     Update-Status; Busy $false
 })
 

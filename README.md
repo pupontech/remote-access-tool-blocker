@@ -44,10 +44,10 @@ They are independent — run either one, or both. Neither needs the other.
    - `full-kit-eset-<version>.zip` — both programs, as folders `1` and `2`.
 2. Extract it anywhere on the PC. Keep the folders together — the launchers find the scripts relative to themselves.
 3. **Program 1:** open folder **`1`**, double-click **`START-HERE.bat`** and accept the administrator prompt.
-4. Tick or untick **TeamViewer / AnyDesk / Splashtop / RustDesk**. Ticked = blocked.
+4. **TeamViewer / AnyDesk / Splashtop / RustDesk start unticked** (allowed) on a fresh PC. Ticked = blocked. An existing program policy still loads its installed choices.
 5. Press **BLOCK**.
 6. **Program 2 (only if the PC runs ESET):** open folder **`2`**, double-click **`START-HERE.bat`**, press
-   **BUILD**, then **paste the list into ESET BY HAND** — the program cannot do it and cannot verify it.
+   **BUILD**, then **import the file into ESET BY HAND** — the program cannot do it and cannot verify it.
    See [The ESET paste](#the-eset-paste--must-be-done-by-hand-by-a-technician).
 
 When program 1 applies the block it also copies a **standalone undo tool** to
@@ -67,64 +67,27 @@ toggle is set to. **Refresh status** lists recent events: `[3077]` means a progr
 >
 > The **BLOCK** button does everything else itself. It **cannot** add the website list to ESET: ESET's URL list is
 > a GUI import/paste with no scriptable interface, and this project deliberately does not guess at ESET's
-> configuration XML. **A technician must copy the list and paste it into ESET by hand, following the steps below.**
+> configuration XML. **A technician must import the file into ESET by hand, following the steps below.**
 >
 > **Do not skip this step and do not assume it happened.** Until it is done, the ESET website layer of the block is
 > not active — the programs are still blocked by Windows App Control, but the tools' download sites and web
 > consoles are not.
 
-**Before you start:** the **BUILD** button in program 2 (`2\START-HERE.bat`) has already built the list and
-**copied it to your clipboard**. It also prints the **exact path of the import file** in the window, like this:
+**Program 2 BUILD** writes one combined file, `eset-blocked-urls.txt`, opens its folder with the file selected, and copies the **full file path** to the clipboard (not the list contents). The path is also printed in the window. **Open the list folder** reopens it without rebuilding.
 
-```
-  IMPORT FILE: C:\Users\<you>\LOLRMM-UrlList\latest\eset-blocked-urls.txt
-  (406 entries)
-  -> list copied to the clipboard (verified) and opening ESET ...
-```
+Both programs start with TeamViewer, AnyDesk, Splashtop and RustDesk unticked (allowed). Their checkboxes are independent. Program 1 loads installed choices when an existing policy is detected.
 
-**If the clipboard does not work** — the program is normally *not* elevated, but if you launched Windows itself
-elevated a different process can own the clipboard — the window says so and tells you to use the file instead:
+**Review before import:** the combined list now includes previously optional AV-update, SaaS and VPN domains. Review optional-tier rows in `url-review.csv` and remove services the client needs from the import file. The protected-root and allow-domain safety filters remain active. There is no second optional import file.
 
-```
-  -> could NOT copy to the clipboard, so use the file instead:
-     in ESET choose Import and pick eset-blocked-urls.txt.
-```
+1. In ESET, press **F5** -> **Protections** -> **Web access protection** -> **URL list management** -> **Address list / Edit**.
+2. Add a new list of type **Blocked**, named **RMM scam block (lolrmm)**, with **List active** ticked.
+3. Inside it choose **Import**. Paste the copied **file path into File name**, then **Open**. If clipboard copy failed, browse to the file in the folder that opened. Do not paste the path into **Enter multiple values**.
+4. Click **OK** on every window to save.
+5. Test a website that actually appears in the generated file. AnyDesk is allowed by default, so it is not a valid default test.
 
-The window also opens the folder for you on that path, with the file already selected. Either route works. The
-clipboard is faster; the file always works. **The list is never lost — it is always on disk at the path the window
-prints.**
+To undo, remove this named list or untick **List active**. Do not remove unrelated pre-existing entries. Program 2 does not apply the Windows program block or verify ESET import; use program 1 independently.
 
-**Lost the folder?** Press **Open the list folder** in program 2 at any time — it opens
-`%USERPROFILE%\LOLRMM-UrlList\latest` with `eset-blocked-urls.txt` selected, without rebuilding anything.
-
-It takes about a minute from here.
-
-**Follow these steps exactly. Every action below is done by hand in the ESET window.**
-
-| # | **Do this by hand** |
-|---|---|
-| 1 | **Press `F5`** in ESET to open **Advanced setup**. |
-| 2 | Click **Protections** → **Web access protection**. |
-| 3 | Open **URL list management**, then next to **Address list** click **Edit**. |
-| 4 | **Make your own list** so undo is one click later: click **Add** (**in the *Address list* window — NOT inside an existing list**), set Address list type to **Blocked**, name it **`RMM scam block (lolrmm)`**, and leave **List active** ticked. |
-| 5 | Inside that list click **Add** → tick **Enter multiple values**. |
-| 6 | **Click in the box and press `Ctrl+V`** to paste the whole list, then click **OK**. *(No clipboard? Use the **Import** button and choose `eset-blocked-urls.txt` from the folder that opened.)* |
-| 7 | Click **OK** on every window, then **OK** in Advanced setup to save. |
-| 8 | **Also block the programs' backstop:** in Advanced setup type **`unsafe`** in the search box and turn **ON** *"Enable detection of potentially unsafe applications"*, then click **OK**. |
-
-> **No `Add` button in step 4?** Paste into ESET's built-in **List of blocked addresses** → **Edit** instead.
-> Undo then takes more work — see the ESET removal guide.
-
-**Test it — by hand:** open a browser and go to **`anydesk.com`**. ESET should show its **"page blocked"** message.
-If it loads normally, the paste did not take — repeat steps 1–7.
-
-**To take the list back out (by hand):** `F5` → **Protections** → **Web access protection** →
-**URL list management** → **Address list** → **Edit**, then select **`RMM scam block (lolrmm)`** → **Remove**, or
-untick **List active** to switch it off but keep it. `OK` → `OK`.
-
-Full detail, including the wording differences between ESET versions, the undo for the built-in list, and the
-entries to remove if a client really uses Quick Assist or Chrome Remote Desktop:
-[`docs/eset-import-guide.md`](docs/eset-import-guide.md).
+See [`docs/eset-import-guide.md`](docs/eset-import-guide.md) and the guide that opens in Notepad.
 
 ### Undoing it later
 
