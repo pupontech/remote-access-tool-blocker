@@ -1,6 +1,6 @@
 # ESET website import (manual)
 
-Program 2 builds one combined `eset-blocked-urls.txt`, copies its full file path to the clipboard, and opens its folder with the file selected. It does not copy the website entries or automatically change ESET.
+Program 2 builds one combined `eset-blocked-urls.txt`, copies its full file path to the clipboard, opens its folder with the file selected, and opens the list itself in Notepad alongside the instructions. It does not copy the website entries or automatically change ESET.
 
 TeamViewer, AnyDesk, Splashtop and RustDesk start unticked (allowed). Tick a tool before BUILD to include it. Program 1 controls the Windows program policy separately and loads an existing policy's choices when available.
 

@@ -2,7 +2,8 @@ IMPORT THE WEBSITE LIST INTO ESET BY HAND
 ========================================
 
 Program 2 builds ONE combined import file: eset-blocked-urls.txt.
-BUILD opens its folder with the file selected and copies the FULL FILE PATH
+BUILD opens the list in Notepad, opens its folder with the file selected,
+and copies the FULL FILE PATH
 (not the website entries) to the clipboard, then opens ESET and this guide.
 If the clipboard is unavailable, the full path is printed in the program.
 Use "Open the list folder" to find the file again without rebuilding it.
