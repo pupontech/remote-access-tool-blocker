@@ -56,7 +56,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$ScriptVersion = '2026-10-14.1-test'
+$ScriptVersion = '2026.10.14.1'
 
 # powershell.exe -File (the .bat launcher) passes "a,b,c" as ONE string - split list params ourselves
 function Split-List([string[]]$v) { @($v | ForEach-Object { $_ -split '[,;]' } | ForEach-Object { $_.Trim() } | Where-Object { $_ }) }

@@ -19,7 +19,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$ScriptVersion = '2026-10-14.1-test'
+$ScriptVersion = '2026.10.14.1'
 $PolicyGuid = '{2D13BFB7-4304-4847-9CDD-37820D3EE9B7}'   # must match Build-/Install-RmmAppControl
 $bare = $PolicyGuid.Trim('{}').ToLowerInvariant()
 $Here = $PSScriptRoot
