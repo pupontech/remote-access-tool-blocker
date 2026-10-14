@@ -73,7 +73,7 @@ toggle is set to. **Refresh status** lists recent events: `[3077]` means a progr
 > not active — the programs are still blocked by Windows App Control, but the tools' download sites and web
 > consoles are not.
 
-**Program 2 BUILD** writes one combined file, `eset-blocked-urls.txt`, opens its folder with the file selected, and copies the **full file path** to the clipboard (not the list contents). The path is also printed in the window. **Open the list folder** reopens it without rebuilding.
+**Program 2 BUILD** writes one combined file, `eset-blocked-urls.txt`, opens its folder with the file selected, opens the list itself in Notepad alongside the instructions, and copies the **full file path** to the clipboard (not the list contents). The path is also printed in the window. **Open the list folder** reopens it without rebuilding.
 
 Both programs start with TeamViewer, AnyDesk, Splashtop and RustDesk unticked (allowed). Their checkboxes are independent. Program 1 loads installed choices when an existing policy is detected.
 

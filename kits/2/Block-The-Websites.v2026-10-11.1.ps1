@@ -20,7 +20,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$ScriptVersion = '2026.10.14.1'
+$ScriptVersion = '2026.10.14.2'
 $Here = $PSScriptRoot
 
 # Where the generated ESET import file goes. Resolved defensively: an unguarded Join-Path here would kill the
@@ -215,6 +215,11 @@ $btnDo.Add_Click({
             }
             Say '  Tip: import it into a NEW list named "RMM scam block (lolrmm)" so UNDO is one click.'
             Open-ListFolder $true
+            # Preview the actual import list as well as the instructions. A Notepad failure
+            # must not prevent the folder, clipboard or ESET handoff from remaining usable.
+            try {
+                Start-Process notepad.exe -ArgumentList ('"' + $UrlListFile + '"')
+            } catch { Say ('  Could not open the list in Notepad: ' + $_.Exception.Message) 'Yellow' }
             Say '  One combined list. Review url-review.csv: it includes AV, SaaS and VPN domains.' 'Yellow'
             # Install the ESET-aware undo tool now that this PC actually has an ESET layer. Program 1
             # installs its own (App Control only) undo tool; this one adds the ESET removal steps.

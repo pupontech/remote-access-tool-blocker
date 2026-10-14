@@ -10,6 +10,7 @@ foreach ($p in $p1, $p2) {
     }
 }
 $websiteSource = Get-Content -Raw $p2.FullName
+Assert ($websiteSource.IndexOf('Start-Process notepad.exe -ArgumentList', $websiteSource.IndexOf('$btnDo.Add_Click')) -ge 0) 'BUILD opens the import list in Notepad'
 Assert ($websiteSource.Contains('Set-Clipboard -Value $UrlListFile')) 'website tool copies import path, not list contents'
 Assert ($websiteSource.IndexOf('Open-ListFolder $true', $websiteSource.IndexOf('$btnDo.Add_Click')) -lt $websiteSource.IndexOf('$instEset =')) 'folder opens before optional undo installation'
 $work = Join-Path ([IO.Path]::GetTempPath()) ('blocker-test-' + [guid]::NewGuid().ToString('N'))
@@ -51,6 +52,7 @@ try {
         & ([scriptblock]::Create($body.Substring(1, $body.Length - 2)))
         Assert ((Get-Clipboard -Raw).TrimEnd("`r", "`n") -eq $UrlListFile) 'clipboard contains exact import file path'
         Assert (@($script:opened | Where-Object { $_.File -eq 'explorer.exe' -and $_.Arguments -eq ('/select,"' + $UrlListFile + '"') }).Count -gt 0) 'Explorer selects import file even when undo installer fails'
+        Assert (@($script:opened | Where-Object { $_.File -eq 'notepad.exe' -and $_.Arguments -eq ('"' + $UrlListFile + '"') }).Count -eq 1) 'Notepad opens the quoted import file path even when undo installer fails'
         Assert ($btnDo.Enabled -and $btnFolder.Enabled) 'buttons re-enabled after installer failure'
         $form.Dispose()
     } else { Write-Host 'Windows UI/clipboard assertions deferred to Windows CI' }

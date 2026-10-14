@@ -1,3 +1,12 @@
+## 2026.10.14.2 - open the website list in Notepad
+
+- BUILD in program 2 now opens the generated eset-blocked-urls.txt in Notepad as well as opening the import instructions.
+- Preserve Explorer selection, verified clipboard file path, combined list and unticked tool defaults.
+- Keep Notepad launch failure non-blocking and open the list before optional undo-tool installation.
+- Regression coverage invokes the actual build handler on Windows PowerShell 5.1 and pwsh and checks the exact quoted Notepad path.
+
+Validation limits: Windows CI verifies launch arguments; visible Notepad and manual ESET import require owner live testing. Windows-only behavior is unchanged.
+
 ## 2026.10.14.1 - import workflow fixes
 
 - Fix the program 1/2 log control: coloured output requires RichTextBox; cosmetic colour errors cannot abort the run.
