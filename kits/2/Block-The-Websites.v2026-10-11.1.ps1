@@ -20,7 +20,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$ScriptVersion = '2026.10.14.2'
+$ScriptVersion = '2026.10.14.3'
 $Here = $PSScriptRoot
 
 # Where the generated ESET import file goes. Resolved defensively: an unguarded Join-Path here would kill the
@@ -98,9 +98,11 @@ $chkA = New-Chk 'AnyDesk' 170 $false
 $chkS = New-Chk 'Splashtop' 310 $false
 $chkR = New-Chk 'RustDesk' 450 $false
 
-$btnDo = New-Btn 'BUILD the list' 16 300 'PaleGreen'
-$btnFolder = New-Btn 'Open the list folder' 326 282 'LightSteelBlue'
+$btnDo = New-Btn 'BUILD the list' 16 180 'PaleGreen'
+$btnFolder = New-Btn 'Open the list folder' 206 220 'LightSteelBlue'
 $btnFolder.Font = New-Object Drawing.Font('Segoe UI', 10)
+$btnList = New-Btn 'Open list' 436 172 'LightSteelBlue'
+$btnList.Font = New-Object Drawing.Font('Segoe UI', 10)
 
 $log = New-Object Windows.Forms.RichTextBox
 $log.Multiline = $true; $log.ScrollBars = 'Vertical'; $log.ReadOnly = $true; $log.WordWrap = $true
@@ -135,7 +137,7 @@ function Run-Script([string]$path, [string[]]$scriptArgs) {
     return $rc
 }
 function Busy([bool]$on) {
-    foreach ($b in $btnDo, $btnFolder) { $b.Enabled = -not $on }
+    foreach ($b in $btnDo, $btnFolder, $btnList) { $b.Enabled = -not $on }
     $form.Cursor = $(if ($on) { 'WaitCursor' } else { 'Default' }); [Windows.Forms.Application]::DoEvents()
 }
 function Open-ListFolder([bool]$selectFile = $false) {
@@ -266,6 +268,17 @@ $btnFolder.Add_Click({
         Say '  press BUILD first, then use this button to open the folder.'
         Open-ListFolder $false
     }
+})
+
+$btnList.Add_Click({
+    if (-not (Test-Path -LiteralPath $UrlListFile -PathType Leaf)) {
+        Say 'No list built yet - press BUILD first.' 'Yellow'
+        return
+    }
+    try {
+        Start-Process notepad.exe -ArgumentList ('"' + $UrlListFile + '"')
+        Say ('Opened list: ' + $UrlListFile)
+    } catch { Say ('Could not open the list in Notepad: ' + $_.Exception.Message) 'Yellow' }
 })
 
 # ---------------------------------------------------------------- start

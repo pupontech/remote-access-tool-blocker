@@ -41,3 +41,5 @@ List active. OK -> OK. Do not delete unrelated pre-existing blocked entries.
 This program does NOT import into ESET automatically or verify the import.
 It does NOT apply the Windows program block. Use 1\START-HERE.bat for that.
 The two programs have independent checkboxes; set each one as required.
+
+Open list: reopen the existing eset-blocked-urls.txt in Notepad without rebuilding it. If no list exists, press BUILD first.

@@ -1,3 +1,12 @@
+## 2026.10.14.3 - Open list button
+
+- Add a third button, Open list, to program 2. It opens the existing import file in Notepad without rebuilding or changing the clipboard.
+- Keep BUILD and Open the list folder alongside it; disable all three while building.
+- If no list exists, show BUILD-first guidance without starting Notepad.
+- Windows regression tests exercise the real click handler, check the exact quoted path, unchanged file bytes, missing-file handling and busy state.
+
+Validation limits: Windows CI verifies control and launch behavior with intercepted process starts; visible Notepad and manual ESET import remain owner live checks.
+
 ## 2026.10.14.2 - open the website list in Notepad
 
 - BUILD in program 2 now opens the generated eset-blocked-urls.txt in Notepad as well as opening the import instructions.

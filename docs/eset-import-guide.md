@@ -28,3 +28,5 @@ Remove `RMM scam block (lolrmm)` or untick List active. Do not remove unrelated 
 - `skipped.csv`, `ips.txt`, `summary.txt`: diagnostic/reference output, not import lists.
 
 The window writes to `%USERPROFILE%\LOLRMM-UrlList\latest`. The standalone generator defaults to a timestamped directory and accepts `-OutDir`, `-ExcludeTool` and `-AllowDomain`.
+
+Open list: reopen the existing eset-blocked-urls.txt in Notepad without rebuilding it. If no list exists, press BUILD first.

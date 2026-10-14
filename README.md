@@ -390,3 +390,5 @@ This project is not affiliated with, endorsed by, or supported by ESET, Microsof
 All trademarks belong to their respective owners.
 
 Licensed under the **Apache License 2.0** — see [`LICENSE`](LICENSE).
+
+Open list: reopen the existing eset-blocked-urls.txt in Notepad without rebuilding it. If no list exists, press BUILD first.

@@ -10,6 +10,7 @@ foreach ($p in $p1, $p2) {
     }
 }
 $websiteSource = Get-Content -Raw $p2.FullName
+Assert ($websiteSource.Contains("New-Btn 'Open list'")) 'third Open list button exists'
 Assert ($websiteSource.IndexOf('Start-Process notepad.exe -ArgumentList', $websiteSource.IndexOf('$btnDo.Add_Click')) -ge 0) 'BUILD opens the import list in Notepad'
 Assert ($websiteSource.Contains('Set-Clipboard -Value $UrlListFile')) 'website tool copies import path, not list contents'
 Assert ($websiteSource.IndexOf('Open-ListFolder $true', $websiteSource.IndexOf('$btnDo.Add_Click')) -lt $websiteSource.IndexOf('$instEset =')) 'folder opens before optional undo installation'
@@ -54,6 +55,25 @@ try {
         Assert (@($script:opened | Where-Object { $_.File -eq 'explorer.exe' -and $_.Arguments -eq ('/select,"' + $UrlListFile + '"') }).Count -gt 0) 'Explorer selects import file even when undo installer fails'
         Assert (@($script:opened | Where-Object { $_.File -eq 'notepad.exe' -and $_.Arguments -eq ('"' + $UrlListFile + '"') }).Count -eq 1) 'Notepad opens the quoted import file path even when undo installer fails'
         Assert ($btnDo.Enabled -and $btnFolder.Enabled) 'buttons re-enabled after installer failure'
+        # Invoke the real third-button event; opening must not rebuild or change the list.
+        function Run-Script { throw 'Open list must not run scripts or rebuild' }
+        $script:opened = @()
+        $before = (Get-FileHash -LiteralPath $UrlListFile).Hash
+        $openHandler = $ast.Find({ param($n) $n -is [Management.Automation.Language.InvokeMemberExpressionAst] -and $n.Extent.Text.StartsWith('$btnList.Add_Click(') }, $true)
+        Assert ($null -ne $openHandler) 'Open list button has a click handler'
+        $openBody = $openHandler.Arguments[0].ScriptBlock.Extent.Text
+        $openAction = [scriptblock]::Create($openBody.Substring(1, $openBody.Length - 2))
+        & $openAction
+        Assert (@($script:opened).Count -eq 1 -and $script:opened[0].File -eq 'notepad.exe' -and $script:opened[0].Arguments -eq ('"' + $UrlListFile + '"')) 'Open list opens the existing file in Notepad'
+        Assert ((Get-FileHash -LiteralPath $UrlListFile).Hash -eq $before) 'Open list leaves import bytes unchanged'
+        Busy $true
+        Assert (-not $btnList.Enabled) 'Open list disabled while BUILD is busy'
+        Busy $false
+        Assert ($btnList.Enabled) 'Open list re-enabled after BUILD'
+        Remove-Item -LiteralPath $UrlListFile
+        $script:opened = @(); $log.Clear()
+        & $openAction
+        Assert (@($script:opened).Count -eq 0 -and $log.Text -match 'BUILD') 'missing list gives BUILD guidance without launching Notepad'
         $form.Dispose()
     } else { Write-Host 'Windows UI/clipboard assertions deferred to Windows CI' }
 } finally { Remove-Item -LiteralPath $work -Recurse -Force }
