@@ -16,7 +16,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 ROOT="$PWD"
-DATE="${1:-2026.10.11}"
+DATE="${1:-$(tr -d '\r\n' < VERSION)}"
 DIST="$ROOT/dist"
 mkdir -p "$DIST"
 
@@ -49,6 +49,8 @@ GUIDE=revert/docs/eset-remove-guide.txt
 FULL_STAGE=$(mktemp -d)
 trap 'rm -rf "$FULL_STAGE"' EXIT
 mkdir -p "$FULL_STAGE/1" "$FULL_STAGE/2" "$FULL_STAGE/1/policy"
+cp VERSION "$FULL_STAGE/1/VERSION"
+cp VERSION "$FULL_STAGE/2/VERSION"
 
 # program 1 - App Control only. The WinOnly revert variant gives it an ESET-FREE undo tool.
 cp kits/1/START-HERE.bat                              "$FULL_STAGE/1/"
@@ -69,6 +71,7 @@ cp "$GUIDE" "$FULL_STAGE/2/revert-docs/"
 WIN_STAGE=$(mktemp -d)
 trap 'rm -rf "$FULL_STAGE" "$WIN_STAGE"' EXIT
 mkdir -p "$WIN_STAGE/policy"
+cp VERSION "$WIN_STAGE/VERSION"
 cp kits/windows-only/START-HERE.bat                   "$WIN_STAGE/"
 cp "$(pick 'Remote-Tools-Block-Windows.v*.ps1' kits/windows-only/Remote-Tools-Block-Windows.v*.ps1)" "$WIN_STAGE/"
 cp "$APP_BUILD" "$APP_INST" src/appcontrol/Run-RmmAppControl.bat "$WIN_STAGE/"

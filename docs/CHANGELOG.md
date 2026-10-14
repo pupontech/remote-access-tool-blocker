@@ -1,3 +1,13 @@
+## 2026.10.14.1 - import workflow fixes
+
+- Fix the program 1/2 log control: coloured output requires RichTextBox; cosmetic colour errors cannot abort the run.
+- Program 2 copies and verifies the import file path, opens Explorer before optional undo-tool installation, and keeps the list usable if that installer fails.
+- Produce one combined ESET import list; remove a stale optional list on rebuild. Retain optional-tier review metadata and warn about legitimate AV/SaaS/VPN services.
+- All four tool checkboxes start unticked in programs 1 and 2. Preserve installed-policy choices in program 1.
+- Add Windows PowerShell 5.1 and pwsh regression coverage for the real window, clipboard, Explorer arguments and combined generator.
+
+Validation: Windows-runner regression tests pass; visible Explorer behavior and manual ESET import still require owner live testing. The Windows-only kit remains unchanged in behavior.
+
 # Changelog
 
 All notable changes to this project. Dates are the versioning dates carried in the script filenames.

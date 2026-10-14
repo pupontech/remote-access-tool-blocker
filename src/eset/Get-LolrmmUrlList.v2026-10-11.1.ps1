@@ -30,20 +30,20 @@
 
 .PARAMETER JsonPath     Use this local copy instead of downloading.
 .PARAMETER OutDir       Output folder. Default: %USERPROFILE%\LOLRMM-UrlList\<yyyy-MM-dd_HHmmss>
-.PARAMETER ExcludeTool  Tool-name patterns (-like, case-insensitive) to leave out. Default: Splashtop, mstsc, NVDA
-.PARAMETER AllowDomain  Domains never to block, including everything under them. Default: splashtop.com, splashtop.eu, eset.com
+.PARAMETER ExcludeTool  Tool-name patterns (-like, case-insensitive) to leave out. Default: TeamViewer, AnyDesk, Splashtop, RustDesk, mstsc, NVDA
+.PARAMETER AllowDomain  Domains never to block, including everything under them. Default: teamviewer.com, anydesk.com, rustdesk.com, splashtop.com, splashtop.eu, eset.com
 .PARAMETER ExtraDomain  Extra domains to block (download sites the catalogue only lists via Details.Website - it has
                         e.g. *.net.anydesk.com but NOT anydesk.com). Default: a short list of tools abused in
                         tech-support scams. Every other catalogue website goes to website-candidates.csv for review only.
 .PARAMETER OptionalDomain  Domains that ARE remote-access related but also legitimately used by clients (AV updates, chat
-                        widgets, SaaS, VPNs). Entries under these go to eset-blocked-urls-optional.txt instead of the main file.
+                        widgets, SaaS, VPNs). Entries under these remain in the combined import file and are marked optional in url-review.csv.
 #>
 [CmdletBinding()]
 param(
     [string]$JsonPath,
     [string]$OutDir,
-    [string[]]$ExcludeTool = @('Splashtop', 'mstsc', 'NVDA'),
-    [string[]]$AllowDomain = @('splashtop.com', 'splashtop.eu', 'eset.com'),
+    [string[]]$ExcludeTool = @('TeamViewer', 'AnyDesk', 'Splashtop', 'RustDesk', 'mstsc', 'NVDA'),
+    [string[]]$AllowDomain = @('teamviewer.com', 'anydesk.com', 'rustdesk.com', 'splashtop.com', 'splashtop.eu', 'eset.com'),
     [string[]]$ExtraDomain = @('anydesk.com', 'atera.com', 'beyondtrust.com', 'realvnc.com', 'uvnc.com', 'aspia.org',
         'superops.com', 'netlockrmm.com', 'remoteripple.com', 'setme.net', 'controlio.net', 'xelvarunetio.pro'),
     [string[]]$OptionalDomain = @('sophos.com', 'sophosupd.com', 'sophosupd.net', 'basecamp.com', 'freshworks.com',
@@ -56,7 +56,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$ScriptVersion = '2026-10-11.1'
+$ScriptVersion = '2026.10.14.1'
 
 # powershell.exe -File (the .bat launcher) passes "a,b,c" as ONE string - split list params ourselves
 function Split-List([string[]]$v) { @($v | ForEach-Object { $_ -split '[,;]' } | ForEach-Object { $_.Trim() } | Where-Object { $_ }) }
@@ -221,8 +221,10 @@ $optional = @($final | Where-Object { $_.Tier -eq 'optional' })
 
 # ---------------------------------------------------------------- write
 $utf8 = New-Object System.Text.UTF8Encoding($false)   # no BOM - a BOM would become part of the first entry
-[IO.File]::WriteAllLines((Join-Path $OutDir 'eset-blocked-urls.txt'), [string[]]@($main | ForEach-Object { $_.Entry }), $utf8)
-[IO.File]::WriteAllLines((Join-Path $OutDir 'eset-blocked-urls-optional.txt'), [string[]]@($optional | ForEach-Object { $_.Entry }), $utf8)
+[IO.File]::WriteAllLines((Join-Path $OutDir 'eset-blocked-urls.txt'), [string[]]@($final | Sort-Object Entry | ForEach-Object { $_.Entry }), $utf8)
+# Remove only the legacy second import file when rebuilding the same output folder.
+$legacyOptional = Join-Path $OutDir 'eset-blocked-urls-optional.txt'
+if (Test-Path -LiteralPath $legacyOptional) { Remove-Item -LiteralPath $legacyOptional -Force }
 $final | Export-Csv -NoTypeInformation -Encoding UTF8 -LiteralPath (Join-Path $OutDir 'url-review.csv')
 $websites | Sort-Object Website, Tool | Export-Csv -NoTypeInformation -Encoding UTF8 -LiteralPath (Join-Path $OutDir 'website-candidates.csv')
 if ($skipped.Count -gt 0) {
@@ -235,8 +237,8 @@ $sum += "Get-LolrmmUrlList v$ScriptVersion  -  $(Get-Date -Format 'yyyy-MM-dd HH
 $sum += "Catalogue : $($tools.Count - 1) tools  SHA256 $sha"
 $sum += "Excluded  : $(@($excluded | Sort-Object -Unique).Count) tool(s) by -ExcludeTool [$($ExcludeTool -join ', ')]: $(($excluded | Sort-Object -Unique) -join '; ')"
 $sum += "Allowed   : $($AllowDomain -join ', ')"
-$sum += "eset-blocked-urls.txt : $($main.Count) entries from $(@($main | ForEach-Object { $_.Tools -split '; ' } | Sort-Object -Unique).Count) tools  -> import this"
-$sum += "eset-blocked-urls-optional.txt : $($optional.Count) entries that clients may legitimately use (AV, SaaS, VPN) -> add only per site"
+$sum += "eset-blocked-urls.txt : $($final.Count) entries from $(@($final | ForEach-Object { $_.Tools -split '; ' } | Sort-Object -Unique).Count) tools  -> import this"
+$sum += "Combined list includes $($optional.Count) entries clients may legitimately use (AV, SaaS, VPN). Review optional-tier rows in url-review.csv before import."
 $sum += "website-candidates.csv : $($websites.Count) tool websites NOT blocked (review; add with -ExtraDomain)"
 $sum += "skipped.csv           : $($skipped.Count) rows (Reason column says why)"
 $sum += "ips.txt               : $(@($ips | Sort-Object -Unique).Count) raw IPs (not importable into the URL list)"
