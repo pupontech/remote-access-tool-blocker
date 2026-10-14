@@ -226,6 +226,9 @@ jobs:
       - name: Import workflow regressions (real WinForms and clipboard)
         run: ./tests/Test-ImportWorkflow.ps1
 
+      - name: Part 1 refresh-list regressions (real WinForms)
+        run: ./tests/Test-Part1RefreshList.ps1
+
       - name: Upload test kit
         if: matrix.shell == 'pwsh'
         uses: actions/upload-artifact@v4

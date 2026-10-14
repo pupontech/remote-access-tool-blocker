@@ -1,0 +1,15 @@
+ALPHA BUILD - DO NOT USE ON A CLIENT PC
+=======================================
+
+This kit was built from an ALPHA prerelease. It carries an unfinished feature and
+has NOT been validated for real use.
+
+USE THE STABLE RELEASE INSTEAD:
+  on GitHub, the release titled  "USE THIS - Stable ..."
+  (currently v2026.10.14.3)
+
+What is unfinished here: program 1 has a new "Refresh list" button that rebuilds
+the Windows App Control signer list from lolrmm.io on demand. A real rebuild and
+the on-screen dialog have not been tested on hardware.
+
+The stable kit is otherwise identical apart from that button.

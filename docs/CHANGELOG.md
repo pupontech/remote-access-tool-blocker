@@ -1,3 +1,22 @@
+## 2026.10.15.0-alpha.1 - ALPHA, DO NOT USE (Refresh list button)
+
+> **ALPHA - DO NOT USE.** This is an experimental prerelease. The stable release is
+> v2026.10.14.3 (release title "USE THIS"). Do not deploy this alpha to a client PC.
+
+- Program 1 gains a **Refresh list** button: it rebuilds the Windows App Control signer
+  list from lolrmm.io on demand (with -IncludeOptional), then asks the operator to press
+  BLOCK or Test mode again to install the new list.
+- The button confirms before doing any work, refuses cleanly when the PC cannot build
+  (Windows Home, no ConvertFrom-CIPolicy), disables itself while busy, and states plainly
+  that an already-installed policy keeps the old list until BLOCK is pressed again.
+- Regression tests drive the real click handler with an injected confirmation answer,
+  checking the refusal path, the -IncludeOptional argument, the re-install guidance and
+  the cannot-build path.
+
+Validation limits: Windows CI verifies the handler with intercepted process starts; a real
+lolrmm.io rebuild and the on-screen dialog remain owner live checks. Behaviour of program 2
+and the Windows-only kit is unchanged.
+
 ## 2026.10.14.3 - Open list button
 
 - Add a third button, Open list, to program 2. It opens the existing import file in Notepad without rebuilding or changing the clipboard.
