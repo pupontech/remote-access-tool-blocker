@@ -1,3 +1,12 @@
+## 2026.10.20.1 - ESET handoff failure recovery
+
+- Keep opening the import guide when ESET discovery or startup fails; report the ESET error separately.
+- Handle a missing guide without passing a null path to Test-Path, and report Notepad failures without aborting the handoff.
+- Always restore program 2's buttons after BUILD, including when refreshing list status fails.
+- Add failure-injection regressions using the actual production function and BUILD handler on PowerShell 5.1 and pwsh.
+
+Validation limits: process-start failures are injected; visible windows and importing the list into a real ESET installation remain owner live checks. Program 1 and the refresh-button alpha are unchanged.
+
 ## 2026.10.14.3 - Open list button
 
 - Add a third button, Open list, to program 2. It opens the existing import file in Notepad without rebuilding or changing the clipboard.

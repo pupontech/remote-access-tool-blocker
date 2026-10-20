@@ -70,6 +70,12 @@ try {
         Assert (-not $btnList.Enabled) 'Open list disabled while BUILD is busy'
         Busy $false
         Assert ($btnList.Enabled) 'Open list re-enabled after BUILD'
+        # A status read can fail after generation (permissions, file replaced with a directory).
+        # Exercise the real Busy helper and real controls, not just the portable handler probe.
+        function Update-Status { throw 'controlled status refresh failure' }
+        & ([scriptblock]::Create($body.Substring(1, $body.Length - 2)))
+        Assert ($btnDo.Enabled -and $btnFolder.Enabled -and $btnList.Enabled) 'all real buttons recover after status refresh failure'
+        Assert ($log.Text -match 'controlled status refresh failure') 'status refresh error is visible in the real log'
         Remove-Item -LiteralPath $UrlListFile
         $script:opened = @(); $log.Clear()
         & $openAction
