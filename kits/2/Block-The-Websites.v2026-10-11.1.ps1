@@ -94,7 +94,8 @@ function Add-Row($panel, $control) {
 }
 function New-Text([string]$text, [single]$size = 10, [bool]$bold = $false) {
     $label = New-Object Windows.Forms.Label
-    $label.Text = $text; $label.AutoSize = $true; $label.Dock = 'Fill'
+    # Dock Top fills width without stretching the last auto-sized label vertically.
+    $label.Text = $text; $label.AutoSize = $true; $label.Dock = 'Top'
     $label.Margin = New-Object Windows.Forms.Padding(0, 0, 0, 6)
     $style = if ($bold) { [Drawing.FontStyle]::Bold } else { [Drawing.FontStyle]::Regular }
     $label.Font = New-Object Drawing.Font('Segoe UI', $size, $style)
@@ -132,7 +133,6 @@ $layout.BackColor = $canvas
 $scrollHost.Controls.Add($layout)
 $header = New-Stack
 $header.BackColor = $canvas; $header.Padding = New-Object Windows.Forms.Padding(0)
-Add-Row $header (New-Text 'WEBSITE PROTECTION' 9 $true)
 Add-Row $header (New-Text 'Build a safer browsing list.' 24 $true)
 Add-Row $header (New-Text 'Create a website blocklist for ESET. This does not block installed programs.' 10)
 Add-Row $layout $header
@@ -141,7 +141,6 @@ $statusCard = New-Stack
 $statusCard.BackColor = [Drawing.ColorTranslator]::FromHtml('#E5F1F3')
 $status = New-Text '' 11 $true
 Add-Row $statusCard $status
-Add-Row $statusCard (New-Text 'You still need to import this file into ESET.' 10)
 Add-Row $layout $statusCard
 
 $grp = New-Stack
@@ -176,7 +175,8 @@ Add-Row $layout $buildCard
 
 $importCard = New-Stack
 Add-Row $importCard (New-Text '3. Import into ESET' 12 $true)
-Add-Row $importCard (New-Text 'Review the file, then open ESET and follow the instructions. In the Import dialog, paste the copied path into File name, then choose Open.' 10)
+Add-Row $importCard (New-Text 'You still need to import this file into ESET.' 10)
+Add-Row $importCard (New-Text 'Review the list, then follow the instructions. In ESET: Import > File name > paste the path > Open.' 10)
 $pathBox = New-Object Windows.Forms.TextBox
 $pathBox.ReadOnly = $true; $pathBox.Dock = 'Fill'; $pathBox.BorderStyle = 'FixedSingle'
 $pathBox.BackColor = [Drawing.Color]::White; $pathBox.ForeColor = $ink

@@ -56,10 +56,6 @@ try {
         $form.PerformLayout(); [Windows.Forms.Application]::DoEvents()
         Assert ($layout.Width -le $scrollHost.ClientSize.Width) "$($case.Name): no horizontal scrolling"
         if ($case.Name -eq 'default') {
-            foreach ($section in $header, $statusCard, $grp, $choices, $buildCard, $buildActions, $importCard, $importActions) {
-                Write-Host ('LAYOUT ' + $section.Name + ' actual=' + $section.Size + ' preferred=' + $section.PreferredSize + ' rows=' + (@($section.GetType().GetMethod('GetRowHeights'))).Count)
-                foreach ($control in $section.Controls) { Write-Host ('  ' + $control.GetType().Name + ' ' + $control.Text + ' bounds=' + $control.Bounds + ' preferred=' + $control.PreferredSize) }
-            }
             $guideBottom = $form.PointToClient($btnGuide.PointToScreen((New-Object Drawing.Point(0, $btnGuide.Height)))).Y
             Assert ($guideBottom -le $form.ClientSize.Height) 'default: all import actions visible without scrolling'
         }
