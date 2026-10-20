@@ -47,7 +47,7 @@ They are independent — run either one, or both. Neither needs the other.
 4. **TeamViewer / AnyDesk / Splashtop / RustDesk start unticked** (allowed) on a fresh PC. Ticked = blocked. An existing program policy still loads its installed choices.
 5. Press **BLOCK**.
 6. **Program 2 (only if the PC runs ESET):** open folder **`2`**, double-click **`START-HERE.bat`**, press
-   **BUILD**, then **import the file into ESET BY HAND** — the program cannot do it and cannot verify it.
+   **Build website list**, then **import the file into ESET BY HAND** — the program cannot do it and cannot verify it.
    See [The ESET paste](#the-eset-paste--must-be-done-by-hand-by-a-technician).
 
 When program 1 applies the block it also copies a **standalone undo tool** to
@@ -73,7 +73,7 @@ toggle is set to. **Refresh status** lists recent events: `[3077]` means a progr
 > not active — the programs are still blocked by Windows App Control, but the tools' download sites and web
 > consoles are not.
 
-**Program 2 BUILD** writes one combined file, `eset-blocked-urls.txt`, opens its folder with the file selected, opens the list itself in Notepad alongside the instructions, and copies the **full file path** to the clipboard (not the list contents). The path is also printed in the window. **Open the list folder** reopens it without rebuilding.
+**Build website list** in program 2 writes one combined file, `eset-blocked-urls.txt`, opens its folder with the file selected, opens the list itself in Notepad alongside the instructions, and copies the **full file path** to the clipboard (not the list contents). The path stays visible in a selectable field under **3. Import into ESET**. **Open file folder** reopens its folder, **Review list** opens the existing file without rebuilding, and **ESET & instructions** reopens the import help. The status reports whether a file is ready, not whether ESET has imported it.
 
 Both programs start with TeamViewer, AnyDesk, Splashtop and RustDesk unticked (allowed). Their checkboxes are independent. Program 1 loads installed choices when an existing policy is detected.
 
@@ -391,4 +391,4 @@ All trademarks belong to their respective owners.
 
 Licensed under the **Apache License 2.0** — see [`LICENSE`](LICENSE).
 
-Open list: reopen the existing eset-blocked-urls.txt in Notepad without rebuilding it. If no list exists, press BUILD first.
+Review list: reopen the existing eset-blocked-urls.txt in Notepad without rebuilding it. If no list exists, press Build website list first.

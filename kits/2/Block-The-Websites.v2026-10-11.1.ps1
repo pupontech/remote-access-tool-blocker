@@ -20,7 +20,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$ScriptVersion = '2026.10.20.1'
+$ScriptVersion = '2026.10.20.2'
 $Here = $PSScriptRoot
 
 # Where the generated ESET import file goes. Resolved defensively: an unguarded Join-Path here would kill the
@@ -59,57 +59,161 @@ function Find-Newest([string]$pattern, [string]$dir) {
 }
 
 # ---------------------------------------------------------------- window
+# Native WinForms, without browser runtimes, downloaded fonts or theme dependencies.
+$ink = [Drawing.ColorTranslator]::FromHtml('#172B3A')
+$muted = [Drawing.ColorTranslator]::FromHtml('#506174')
+$accent = [Drawing.ColorTranslator]::FromHtml('#087F8C')
+$canvas = [Drawing.ColorTranslator]::FromHtml('#F3F6F8')
 $form = New-Object Windows.Forms.Form
-$form.Text = "2 - Block the remote-access WEBSITES in ESET  (v$ScriptVersion)"
-$form.Size = New-Object Drawing.Size(640, 610)
+$form.Text = "Website protection | ESET list builder - v$ScriptVersion"
+$form.AutoScaleDimensions = New-Object Drawing.SizeF(96, 96)
+$form.AutoScaleMode = 'Dpi'
+$form.ClientSize = New-Object Drawing.Size(884, 841)
+$form.MinimumSize = New-Object Drawing.Size(760, 680)
 $form.StartPosition = 'CenterScreen'
 $form.Font = New-Object Drawing.Font('Segoe UI', 10)
-$form.MinimumSize = $form.Size
+$form.ForeColor = $ink; $form.BackColor = $canvas
 
-$title = New-Object Windows.Forms.Label
-$title.Text = 'Blocks the download pages and web consoles of the remote-access tools scammers use, in ESET. Needs ESET.'
-$title.Location = New-Object Drawing.Point(16, 8); $title.Size = New-Object Drawing.Size(600, 36)
-$form.Controls.Add($title)
-
-$status = New-Object Windows.Forms.Label
-$status.Location = New-Object Drawing.Point(16, 44); $status.Size = New-Object Drawing.Size(600, 40)
-$status.Font = New-Object Drawing.Font('Segoe UI', 10, [Drawing.FontStyle]::Bold)
-$form.Controls.Add($status)
-
-function New-Btn([string]$text, [int]$x, [int]$w, [string]$color) {
+$scrollHost = New-Object Windows.Forms.Panel
+$scrollHost.Dock = 'Fill'; $scrollHost.AutoScroll = $true
+$form.Controls.Add($scrollHost)
+function New-Stack {
+    $panel = New-Object Windows.Forms.TableLayoutPanel
+    $panel.ColumnCount = 1; $panel.RowCount = 0
+    [void]$panel.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Percent', 100)))
+    $panel.Dock = 'Top'; $panel.AutoSize = $true; $panel.AutoSizeMode = 'GrowAndShrink'
+    $panel.Margin = New-Object Windows.Forms.Padding(0, 0, 0, 10)
+    $panel.Padding = New-Object Windows.Forms.Padding(12)
+    $panel.BackColor = [Drawing.Color]::White
+    return $panel
+}
+function Add-Row($panel, $control) {
+    $row = $panel.RowCount; $panel.RowCount++
+    [void]$panel.RowStyles.Add((New-Object Windows.Forms.RowStyle('AutoSize')))
+    $panel.Controls.Add($control, 0, $row)
+}
+function New-Text([string]$text, [single]$size = 10, [bool]$bold = $false) {
+    $label = New-Object Windows.Forms.Label
+    # Dock Top fills width without stretching the last auto-sized label vertically.
+    $label.Text = $text; $label.AutoSize = $true; $label.Dock = 'Top'
+    $label.Margin = New-Object Windows.Forms.Padding(0, 0, 0, 6)
+    $style = if ($bold) { [Drawing.FontStyle]::Bold } else { [Drawing.FontStyle]::Regular }
+    $label.Font = New-Object Drawing.Font('Segoe UI', $size, $style)
+    $label.ForeColor = if ($bold) { $ink } else { $muted }
+    return $label
+}
+function New-Btn([string]$text, [int]$width, [bool]$primary = $false) {
     $b = New-Object Windows.Forms.Button
-    $b.Text = $text; $b.Location = New-Object Drawing.Point($x, 142); $b.Size = New-Object Drawing.Size($w, 64)
-    $b.Font = New-Object Drawing.Font('Segoe UI', 12, [Drawing.FontStyle]::Bold)
-    $b.BackColor = [Drawing.Color]::FromName($color); $b.FlatStyle = 'Flat'
-    $form.Controls.Add($b); return $b
+    $b.Text = $text; $b.Size = New-Object Drawing.Size($width, 42)
+    $b.Margin = New-Object Windows.Forms.Padding(0, 4, 10, 4)
+    $b.FlatStyle = 'Flat'; $b.FlatAppearance.BorderSize = 1
+    $b.FlatAppearance.BorderColor = [Drawing.ColorTranslator]::FromHtml('#C8D4DC')
+    $b.BackColor = [Drawing.Color]::White; $b.ForeColor = $ink
+    $b.Font = New-Object Drawing.Font('Segoe UI', 10, [Drawing.FontStyle]::Bold)
+    $b.UseVisualStyleBackColor = $false; $b.Cursor = 'Hand'
+    if ($primary) {
+        $b.BackColor = $accent; $b.ForeColor = [Drawing.Color]::White
+        $b.FlatAppearance.BorderColor = $accent
+        $b.FlatAppearance.MouseOverBackColor = [Drawing.ColorTranslator]::FromHtml('#096C77')
+    }
+    $b.AccessibleName = $text
+    return $b
 }
-$grp = New-Object Windows.Forms.GroupBox
-$grp.Text = 'Block these websites (untick = allowed on this PC):'
-$grp.Location = New-Object Drawing.Point(16, 84); $grp.Size = New-Object Drawing.Size(592, 52)
-$form.Controls.Add($grp)
-function New-Chk([string]$text, [int]$x, [bool]$on) {
+function New-Actions {
+    $flow = New-Object Windows.Forms.FlowLayoutPanel
+    $flow.Size = New-Object Drawing.Size(1, 1)
+    $flow.AutoSize = $true; $flow.AutoSizeMode = 'GrowAndShrink'
+    $flow.Dock = 'Fill'; $flow.WrapContents = $true; $flow.Margin = New-Object Windows.Forms.Padding(0)
+    return $flow
+}
+$layout = New-Stack
+$layout.Padding = New-Object Windows.Forms.Padding(20)
+$layout.Margin = New-Object Windows.Forms.Padding(0)
+$layout.BackColor = $canvas
+$scrollHost.Controls.Add($layout)
+$header = New-Stack
+$header.BackColor = $canvas; $header.Padding = New-Object Windows.Forms.Padding(0)
+Add-Row $header (New-Text 'Build a safer browsing list.' 24 $true)
+Add-Row $header (New-Text 'Create a website blocklist for ESET. This does not block installed programs.' 10)
+Add-Row $layout $header
+
+$statusCard = New-Stack
+$statusCard.BackColor = [Drawing.ColorTranslator]::FromHtml('#E5F1F3')
+$status = New-Text '' 11 $true
+Add-Row $statusCard $status
+Add-Row $layout $statusCard
+
+$grp = New-Stack
+Add-Row $grp (New-Text '1. Choose which websites to block' 12 $true)
+Add-Row $grp (New-Text 'The list covers many remote-access tools. These four are optional:' 10)
+$choices = New-Actions
+function New-Chk([string]$text, [int]$tabIndex, [bool]$on) {
     $c = New-Object Windows.Forms.CheckBox
-    $c.Text = $text; $c.Checked = $on; $c.Location = New-Object Drawing.Point($x, 20); $c.AutoSize = $true
-    $grp.Controls.Add($c); return $c
+    $c.Text = $text; $c.Checked = $on; $c.AutoSize = $true; $c.TabIndex = $tabIndex
+    $c.Margin = New-Object Windows.Forms.Padding(0, 6, 28, 6)
+    $c.AccessibleName = 'Block ' + $text + ' websites'
+    $choices.Controls.Add($c); return $c
 }
-# All four tools are allowed by default, matching a fresh program 1 window.
+# Preserve the accepted default: all four are allowed unless explicitly selected.
 $chkT = New-Chk 'TeamViewer' 12 $false
 $chkA = New-Chk 'AnyDesk' 170 $false
 $chkS = New-Chk 'Splashtop' 310 $false
 $chkR = New-Chk 'RustDesk' 450 $false
+Add-Row $grp $choices
+Add-Row $grp (New-Text 'Checked = blocked. Unchecked = allowed.' 9)
+Add-Row $layout $grp
 
-$btnDo = New-Btn 'BUILD the list' 16 180 'PaleGreen'
-$btnFolder = New-Btn 'Open the list folder' 206 220 'LightSteelBlue'
-$btnFolder.Font = New-Object Drawing.Font('Segoe UI', 10)
-$btnList = New-Btn 'Open list' 436 172 'LightSteelBlue'
-$btnList.Font = New-Object Drawing.Font('Segoe UI', 10)
+$buildCard = New-Stack
+Add-Row $buildCard (New-Text '2. Build your website list' 12 $true)
+Add-Row $buildCard (New-Text 'Downloads the latest catalogue, creates the file and copies its path for the ESET import dialog.' 10)
+$buildActions = New-Actions
+$btnDo = New-Btn 'Build website list' 200 $true
+$buildActions.Controls.Add($btnDo)
+Add-Row $buildCard $buildActions
+Add-Row $buildCard (New-Text 'Review the list before importing: it can include antivirus, cloud-service and VPN websites.' 9)
+Add-Row $layout $buildCard
 
+$importCard = New-Stack
+Add-Row $importCard (New-Text '3. Import into ESET' 12 $true)
+Add-Row $importCard (New-Text 'You still need to import this file into ESET.' 10)
+Add-Row $importCard (New-Text 'Review the list, then follow the instructions. In ESET: Import > File name > paste the path > Open.' 10)
+$pathBox = New-Object Windows.Forms.TextBox
+$pathBox.ReadOnly = $true; $pathBox.Dock = 'Fill'; $pathBox.BorderStyle = 'FixedSingle'
+$pathBox.BackColor = [Drawing.Color]::White; $pathBox.ForeColor = $ink
+$pathBox.Margin = New-Object Windows.Forms.Padding(0, 4, 0, 6)
+$pathBox.AccessibleName = 'ESET import file path'
+Add-Row $importCard $pathBox
+Add-Row $importCard (New-Text 'File path - select and press Ctrl+C to copy it again. Do not paste the path into Enter multiple values.' 9)
+$importActions = New-Actions
+$btnFolder = New-Btn 'Open file folder' 155
+$btnList = New-Btn 'Review list' 140
+$btnGuide = New-Btn 'ESET & instructions' 195
+# Ampersand is literal here, not a hidden keyboard mnemonic.
+$btnGuide.UseMnemonic = $false
+foreach ($button in $btnFolder, $btnList, $btnGuide) { $importActions.Controls.Add($button) }
+Add-Row $importCard $importActions
+Add-Row $layout $importCard
+
+Add-Row $layout (New-Text 'Activity and troubleshooting' 10 $true)
 $log = New-Object Windows.Forms.RichTextBox
 $log.Multiline = $true; $log.ScrollBars = 'Vertical'; $log.ReadOnly = $true; $log.WordWrap = $true
-$log.Location = New-Object Drawing.Point(16, 218); $log.Size = New-Object Drawing.Size(592, 340)
-$log.Anchor = 'Top, Bottom, Left, Right'
+$log.Dock = 'Fill'; $log.Height = 150; $log.BorderStyle = 'None'
+$log.BackColor = [Drawing.Color]::White; $log.ForeColor = $ink
 $log.Font = New-Object Drawing.Font('Consolas', 9)
-$form.Controls.Add($log)
+$log.Margin = New-Object Windows.Forms.Padding(0, 0, 0, 8)
+$log.AccessibleName = 'Activity and troubleshooting log'
+Add-Row $layout $log
+# Let long explanations wrap at the current window width, including high-DPI scaling.
+$layout.Add_SizeChanged({
+    $width = [Math]::Max(200, $layout.ClientSize.Width - $layout.Padding.Horizontal - $grp.Padding.Horizontal)
+    foreach ($section in $header, $statusCard, $grp, $buildCard, $importCard, $layout) {
+        foreach ($control in $section.Controls) {
+            if ($control -is [Windows.Forms.Label] -and $control.MaximumSize.Width -ne $width) {
+                $control.MaximumSize = New-Object Drawing.Size($width, 0)
+            }
+        }
+    }
+})
 
 function Say([string]$m, [string]$color = '') {
     # RichTextBox, NOT TextBox: SelectionColor (the colouring below) is a RichTextBox property only.
@@ -123,7 +227,12 @@ function Say([string]$m, [string]$color = '') {
             $n = $log.TextLength
             $log.SelectionStart = $n - $m.Length - 2
             $log.SelectionLength = $m.Length
-            $log.SelectionColor = [Drawing.Color]::FromName($color)
+            $log.SelectionColor = switch ($color) {
+                'Yellow' { [Drawing.ColorTranslator]::FromHtml('#855400') }
+                'Green' { [Drawing.ColorTranslator]::FromHtml('#176744') }
+                'Red' { [Drawing.ColorTranslator]::FromHtml('#B42318') }
+                default { [Drawing.Color]::FromName($color) }
+            }
             $log.SelectionStart = $n
             $log.SelectionLength = 0
         } catch { }
@@ -137,7 +246,7 @@ function Run-Script([string]$path, [string[]]$scriptArgs) {
     return $rc
 }
 function Busy([bool]$on) {
-    foreach ($b in $btnDo, $btnFolder, $btnList) { $b.Enabled = -not $on }
+    foreach ($b in $btnDo, $btnFolder, $btnList, $btnGuide) { $b.Enabled = -not $on }
     $form.Cursor = $(if ($on) { 'WaitCursor' } else { 'Default' }); [Windows.Forms.Application]::DoEvents()
 }
 function Open-ListFolder([bool]$selectFile = $false) {
@@ -171,11 +280,13 @@ function Open-EsetAndGuide {
 function Update-Status {
     if (Test-Path -LiteralPath $UrlListFile) {
         $n = @(Get-Content -LiteralPath $UrlListFile).Count
-        $status.Text = "Status: a list of $n entries is ready at $UrlOut`r`nImport it into ESET by hand (press BUILD to rebuild)."
-        $status.ForeColor = [Drawing.Color]::DarkGreen
+        $status.Text = "List ready: $n website entries. Next: review and import into ESET."
+        $status.ForeColor = $ink
+        $pathBox.Text = $UrlListFile
     } else {
-        $status.Text = 'Status: no list built yet - press BUILD.'
-        $status.ForeColor = [Drawing.Color]::DarkRed
+        $status.Text = 'No list built yet. Start with step 1 below.'
+        $status.ForeColor = $ink
+        $pathBox.Text = ''
     }
 }
 
@@ -291,10 +402,11 @@ $btnList.Add_Click({
     } catch { Say ('Could not open the list in Notepad: ' + $_.Exception.Message) 'Yellow' }
 })
 
+$btnGuide.Add_Click({ Open-EsetAndGuide })
+
 # ---------------------------------------------------------------- start
-Say 'BUILD = build the ESET website list and open ESET + the guide (the import is a by-hand step).'
-Say 'Unticked tools are left OUT of the list, so a tool your client uses is not blocked on the web.'
-Say ''
-Say 'Nothing here changes ESET by itself - you import the list by hand. See HOW-TO-IMPORT.txt.'
+Say 'Choose any optional websites to block, then click Build website list.'
+Say 'The file path is copied automatically. Review the file, then follow step 3 to import into ESET.'
+Say 'ESET is not changed automatically. Keep websites your client needs out of the list.'
 Update-Status
 [void]$form.ShowDialog()
