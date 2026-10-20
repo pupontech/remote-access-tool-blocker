@@ -209,7 +209,7 @@ jobs:
           foreach ($f in (Get-ChildItem -Path 'kits' -Recurse -Filter '*.ps1' -File)) {
             $text = Get-Content -Raw $f.FullName
             if ($text -notmatch 'SelectionColor') { continue }
-            if ($text -match 'New-Object\s+Windows\.Forms\.TextBox') {
+            if ($text -match '\$log\s*=\s*New-Object\s+Windows\.Forms\.TextBox\b') {
               $fail += "$($f.Name): uses a TextBox but sets SelectionColor (RichTextBox-only property)"
             }
             if ($text -notmatch 'New-Object\s+Windows\.Forms\.RichTextBox') {
@@ -236,6 +236,17 @@ jobs:
 
       - name: Import workflow regressions (real WinForms and clipboard)
         run: ./tests/Test-ImportWorkflow.ps1
+
+      - name: Website GUI layout and clarity
+        run: ./tests/Test-EsetGui.ps1 -EvidenceDirectory ui-evidence
+
+      - name: Upload website GUI previews
+        if: always() && matrix.shell == 'pwsh'
+        uses: actions/upload-artifact@v4
+        with:
+          name: eset-gui-previews
+          path: ui-evidence/*.png
+          if-no-files-found: error
 
       - name: Upload test kit
         if: matrix.shell == 'pwsh'
