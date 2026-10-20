@@ -10,7 +10,7 @@ foreach ($p in $p1, $p2) {
     }
 }
 $websiteSource = Get-Content -Raw $p2.FullName
-Assert ($websiteSource.Contains("New-Btn 'Open list'")) 'third Open list button exists'
+Assert ($websiteSource.Contains("New-Btn 'Review list'")) 'Review list button exists'
 Assert ($websiteSource.IndexOf('Start-Process notepad.exe -ArgumentList', $websiteSource.IndexOf('$btnDo.Add_Click')) -ge 0) 'BUILD opens the import list in Notepad'
 Assert ($websiteSource.Contains('Set-Clipboard -Value $UrlListFile')) 'website tool copies import path, not list contents'
 Assert ($websiteSource.IndexOf('Open-ListFolder $true', $websiteSource.IndexOf('$btnDo.Add_Click')) -lt $websiteSource.IndexOf('$instEset =')) 'folder opens before optional undo installation'

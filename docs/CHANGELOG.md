@@ -1,3 +1,14 @@
+## 2026.10.20.2 - Clearer ESET website interface
+
+- Redesign program 2 with a light neutral canvas, white sections, a teal primary action, and consistent Segoe UI typography.
+- Show three permanent steps: choose optional websites, build the list, then import into ESET manually.
+- Explain checkbox meanings and the limits of this tool without making users read the activity log.
+- Keep the import path visible in a selectable read-only field; add a button to reopen ESET and the instructions.
+- Preserve accepted defaults, automatic clipboard/file presentation and all working failure recovery. Program 1 and the separate alpha are unchanged.
+- Use wrapping layout containers and vertical scrolling rather than fixed-position controls. Add Windows layout, action-state, instruction-button and screenshot checks.
+
+Validation limits: Windows-rendered previews and synthetic action tests do not verify importing into an installed ESET product or physical high-DPI displays.
+
 ## 2026.10.20.1 - ESET handoff failure recovery
 
 - Keep opening the import guide when ESET discovery or startup fails; report the ESET error separately.
