@@ -161,7 +161,6 @@ $chkS = New-Chk 'Splashtop' 310 $false
 $chkR = New-Chk 'RustDesk' 450 $false
 Add-Row $grp $choices
 Add-Row $grp (New-Text 'Checked = blocked. Unchecked = allowed.' 9)
-Add-Row $layout $grp
 
 $buildCard = New-Stack
 Add-Row $buildCard (New-Text '2. Build your website list' 12 $true)
@@ -171,7 +170,18 @@ $btnDo = New-Btn 'Build website list' 200 $true
 $buildActions.Controls.Add($btnDo)
 Add-Row $buildCard $buildActions
 Add-Row $buildCard (New-Text 'Review the list before importing: it can include antivirus, cloud-service and VPN websites.' 9)
-Add-Row $layout $buildCard
+# Pair choosing and building on one row so the manual-import actions stay visible.
+$steps = New-Object Windows.Forms.TableLayoutPanel
+$steps.ColumnCount = 2; $steps.RowCount = 1
+$steps.Dock = 'Top'; $steps.AutoSize = $true; $steps.AutoSizeMode = 'GrowAndShrink'
+$steps.Margin = New-Object Windows.Forms.Padding(0, 0, 0, 10)
+[void]$steps.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Percent', 45)))
+[void]$steps.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Percent', 55)))
+[void]$steps.RowStyles.Add((New-Object Windows.Forms.RowStyle('AutoSize')))
+$grp.Margin = New-Object Windows.Forms.Padding(0, 0, 6, 0)
+$buildCard.Margin = New-Object Windows.Forms.Padding(6, 0, 0, 0)
+$steps.Controls.Add($grp, 0, 0); $steps.Controls.Add($buildCard, 1, 0)
+Add-Row $layout $steps
 
 $importCard = New-Stack
 Add-Row $importCard (New-Text '3. Import into ESET' 12 $true)
@@ -205,8 +215,8 @@ $log.AccessibleName = 'Activity and troubleshooting log'
 Add-Row $layout $log
 # Let long explanations wrap at the current window width, including high-DPI scaling.
 $layout.Add_SizeChanged({
-    $width = [Math]::Max(200, $layout.ClientSize.Width - $layout.Padding.Horizontal - $grp.Padding.Horizontal)
     foreach ($section in $header, $statusCard, $grp, $buildCard, $importCard, $layout) {
+        $width = [Math]::Max(100, $section.ClientSize.Width - $section.Padding.Horizontal)
         foreach ($control in $section.Controls) {
             if ($control -is [Windows.Forms.Label] -and $control.MaximumSize.Width -ne $width) {
                 $control.MaximumSize = New-Object Drawing.Size($width, 0)
