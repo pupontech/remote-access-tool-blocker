@@ -20,7 +20,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$ScriptVersion = '2026.10.14.3'
+$ScriptVersion = '2026.10.20.1'
 $Here = $PSScriptRoot
 
 # Where the generated ESET import file goes. Resolved defensively: an unguarded Join-Path here would kill the
@@ -156,10 +156,17 @@ function Open-ListFolder([bool]$selectFile = $false) {
     }
 }
 function Open-EsetAndGuide {
-    $egui = Get-ChildItem -Path (Join-Path $env:ProgramFiles 'ESET') -Filter egui.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($egui) { Start-Process -FilePath $egui.FullName } else { Say '  ESET not found - open it from the Start menu.' }
-    $guide = Find-Newest 'HOW-TO-IMPORT.txt' $Parts.Eset
-    if (Test-Path -LiteralPath $guide) { Start-Process notepad.exe -ArgumentList "`"$guide`"" } else { Say '  (the guide HOW-TO-IMPORT.txt was not found next to this program.)' 'Yellow' }
+    # These are independent conveniences: failure to open one must not skip the other.
+    try {
+        $egui = Get-ChildItem -Path (Join-Path $env:ProgramFiles 'ESET') -Filter egui.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($egui) { Start-Process -FilePath $egui.FullName } else { Say '  ESET not found - open it from the Start menu.' }
+    } catch { Say ('  Could not open ESET: ' + $_.Exception.Message + '. Open it from the Start menu.') 'Yellow' }
+    try {
+        $guide = Find-Newest 'HOW-TO-IMPORT.txt' $Parts.Eset
+        if ($guide -and (Test-Path -LiteralPath $guide -PathType Leaf)) {
+            Start-Process notepad.exe -ArgumentList ('"' + $guide + '"')
+        } else { Say '  (the guide HOW-TO-IMPORT.txt was not found next to this program.)' 'Yellow' }
+    } catch { Say ('  Could not open the import guide: ' + $_.Exception.Message) 'Yellow' }
 }
 function Update-Status {
     if (Test-Path -LiteralPath $UrlListFile) {
@@ -252,8 +259,11 @@ $btnDo.Add_Click({
         Say ('ERROR: ' + $_.Exception.Message) 'Red'
         Say ('       at line ' + $_.InvocationInfo.ScriptLineNumber + ': ' + $_.InvocationInfo.Line.Trim())
         Say '       the list file may still be on disk - press "Open the list folder" to check.'
+    } finally {
+        try { Update-Status }
+        catch { Say ('  Could not refresh list status: ' + $_.Exception.Message) 'Yellow' }
+        finally { Busy $false }
     }
-    Update-Status; Busy $false
 })
 
 $btnFolder.Add_Click({

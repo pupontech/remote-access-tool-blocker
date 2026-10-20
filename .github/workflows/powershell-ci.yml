@@ -223,6 +223,17 @@ jobs:
           if ($fail.Count -gt 0) { $fail | ForEach-Object { Write-Host "::error::$_" }; exit 1 }
           Write-Host 'winforms control contract OK'
 
+      - name: Release ZIP matches committed source bytes
+        run: |
+          $version = (Get-Content -Raw VERSION).Trim()
+          python tests/verify-release-source.py "dist/full-kit-eset-$version.zip"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: ESET handoff and button-recovery regressions
+        run: |
+          ./tests/Test-EsetHandoff.ps1
+          ./tests/Test-EsetButtonRecovery.ps1
+
       - name: Import workflow regressions (real WinForms and clipboard)
         run: ./tests/Test-ImportWorkflow.ps1
 

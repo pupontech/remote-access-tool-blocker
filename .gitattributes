@@ -1,0 +1,3 @@
+# Preserve committed bytes in release ZIPs, including existing CRLF batch launchers
+# and UTF-16 policy files. CI separately enforces script encoding and batch CRLF.
+* -text
