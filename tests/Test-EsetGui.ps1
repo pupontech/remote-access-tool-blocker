@@ -55,6 +55,10 @@ try {
         $scrollHost.AutoScrollPosition = New-Object Drawing.Point(0, 0)
         $form.PerformLayout(); [Windows.Forms.Application]::DoEvents()
         Assert ($layout.Width -le $scrollHost.ClientSize.Width) "$($case.Name): no horizontal scrolling"
+        if ($case.Name -eq 'default') {
+            $guideBottom = $form.PointToClient($btnGuide.PointToScreen((New-Object Drawing.Point(0, $btnGuide.Height)))).Y
+            Assert ($guideBottom -le $form.ClientSize.Height) 'default: all import actions visible without scrolling'
+        }
         foreach ($button in $btnDo, $btnFolder, $btnList, $btnGuide) {
             Assert ($button.Width -ge 120 -and $button.Height -ge 36) "$($case.Name): $($button.Text) has a usable target"
         }

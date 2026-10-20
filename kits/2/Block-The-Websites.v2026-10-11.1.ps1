@@ -82,8 +82,8 @@ function New-Stack {
     $panel.ColumnCount = 1; $panel.RowCount = 0
     [void]$panel.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Percent', 100)))
     $panel.Dock = 'Top'; $panel.AutoSize = $true; $panel.AutoSizeMode = 'GrowAndShrink'
-    $panel.Margin = New-Object Windows.Forms.Padding(0, 0, 0, 12)
-    $panel.Padding = New-Object Windows.Forms.Padding(16)
+    $panel.Margin = New-Object Windows.Forms.Padding(0, 0, 0, 10)
+    $panel.Padding = New-Object Windows.Forms.Padding(12)
     $panel.BackColor = [Drawing.Color]::White
     return $panel
 }
@@ -120,12 +120,13 @@ function New-Btn([string]$text, [int]$width, [bool]$primary = $false) {
 }
 function New-Actions {
     $flow = New-Object Windows.Forms.FlowLayoutPanel
+    $flow.Size = New-Object Drawing.Size(1, 1)
     $flow.AutoSize = $true; $flow.AutoSizeMode = 'GrowAndShrink'
     $flow.Dock = 'Fill'; $flow.WrapContents = $true; $flow.Margin = New-Object Windows.Forms.Padding(0)
     return $flow
 }
 $layout = New-Stack
-$layout.Padding = New-Object Windows.Forms.Padding(24)
+$layout.Padding = New-Object Windows.Forms.Padding(20)
 $layout.Margin = New-Object Windows.Forms.Padding(0)
 $layout.BackColor = $canvas
 $scrollHost.Controls.Add($layout)
