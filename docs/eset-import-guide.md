@@ -2,7 +2,7 @@
 
 Program 2 builds one combined `eset-blocked-urls.txt`, copies its full file path to the clipboard, opens its folder with the file selected, and opens the list itself in Notepad alongside the instructions. It does not copy the website entries or automatically change ESET.
 
-TeamViewer, AnyDesk, Splashtop and RustDesk start unticked (allowed). Tick a tool before BUILD to include it. Program 1 controls the Windows program policy separately and loads an existing policy's choices when available.
+TeamViewer, AnyDesk and RustDesk start ticked (included in the list); Splashtop starts unticked (left out). Untick a tool the client really uses before BUILD. Program 1 controls the Windows program policy separately and loads an existing policy's choices when available.
 
 ## Review first
 
@@ -14,7 +14,7 @@ The combined list includes previously optional domains used for AV updates, SaaS
 2. Add a new Blocked list named `RMM scam block (lolrmm)` and leave List active ticked. If your ESET does not allow a named list, edit List of blocked addresses instead.
 3. Inside the list choose Import. Paste the copied **file path into File name**, then Open. If clipboard copy failed, browse to the file in the opened folder. **Do not paste the file path into Enter multiple values.**
 4. OK on every window to save. The program cannot verify this step.
-5. Test a website actually in the generated list. AnyDesk is allowed by default and is not a default test target.
+5. Test a website actually in the generated list, for example `anydesk.com` if AnyDesk was left ticked.
 
 ## Undo
 

@@ -33,6 +33,23 @@ Optional vendors are **not** blocked by default because their certificate also s
 purpose — NetSupport School, Impero/Netop and Veyon (schools), GoTo, Zoho, AOMEI, RealVNC, Famatech
 (Advanced IP Scanner), Kaseya, N-able, Ivanti. Pass `-IncludeOptional` to add them.
 
+### Keeping up with catalogue changes
+
+The `lolrmm-watch` workflow runs every Monday (or by hand from the Actions tab) and runs
+`build/Update-LolrmmBaseline.ps1` against the live catalogue. `data/lolrmm-baseline/` records the catalogue the
+repo was last reviewed against: its SHA256, every tool name, the ESET block list and review list, and the
+skipped signers. When the hash changes, the workflow opens or refreshes one pull request from `bot/lolrmm-update`.
+The pull request's description lists:
+
+- tools that were added or removed
+- domains that are now blocked, or no longer blocked
+- App Control deny rules that were added or removed
+- new vendors that are on neither signer list and need a decision
+
+`policy/` is rebuilt only when the set of deny rules changes, because every rebuild gets a new version number
+and timestamp, which would show up as changes even when the rules are the same. Merging the pull request accepts
+the new baseline. Nothing is installed anywhere.
+
 ## The policy layout
 
 The base is Microsoft's `%windir%\schemas\CodeIntegrity\ExamplePolicies\AllowAll.xml` — allow-all, with **user-mode

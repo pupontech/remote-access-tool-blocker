@@ -1,0 +1,352 @@
+247ithelp.com (ConnectWise)
+Absolute (Computrace)
+Access Remote PC
+Acronis Cyber Protect (Remotix)
+Action1
+Addigy
+Adobe Connect
+AeroAdmin
+AliWangWang-remote-control
+Allocentra
+Alpemix
+Ammyy Admin
+Any Support
+AnyDesk
+Anyplace Control
+AnyViewer
+Apple Remote Desktop
+Aspia
+Atera
+Auvik
+AweRay
+baramundi Management Suite
+Barracuda
+Basecamp
+Basic RMM Agent
+Beacon (Synertek)
+BeamYourScreen
+BeAnyWhere
+BeInSync
+BeyondTrust
+BeyondTrust (Bomgar)
+Bitvise SSH Client
+Bitvise SSH Server
+BlackCrypt RMM Agent
+Bluetrait
+Borealis
+BreezeRMM
+CentraStage (Now Datto)
+Centurion
+CHAOS RAT
+Chicken (of the VNC)
+Chrome Remote Desktop
+Chrome SSH Extension
+CloudFlare Tunnel
+Comodo RMM
+ConnectWise
+Connectwise Automate (LabTech)
+ConnectWise Control
+Controlio
+ControlR
+CrossLoop
+CrossTec Remote Control
+CruzControl
+DameWare
+Dataplicity
+DeskDay
+DeskNets
+DeskShare
+DesktopNow
+Dev Tunnels (aka Visual Studio Dev Tunnel)
+Devolutions Remote Desktop Manager
+Distant Desktop
+Domotz
+DragonDisk
+Duet Display
+Duplicati
+DW Service
+Echoware
+eHorus
+Electric AI (Kaseya)
+EMCO Remote Console
+Encapto
+Endar
+Ericom AccessNow
+Ericom Connect
+ESET Remote Administrator
+ExtraPuTTY
+ezHelp
+Faronics Core
+Faronics Deep Freeze
+Faronics Deploy
+Faronics Insight
+FastViewer
+FixMe.it
+FleetDeck.io
+Fortra
+Free Ping Tool
+Free Tools Launcher
+FreeNX
+FreeRDP
+Freshservice
+GatherPlace-desktop sharing
+GetScreen
+GLPI Agent
+Go Mini RMM
+GO RMM
+Gorelo RMM
+GoTo Opener
+GoToAssist
+GoToAssist (GoTo Resolve)
+GoToAssist Agent Desktop Console
+GotoHTTP
+GoToMyPC
+Goverlan
+Guacamole
+GxM RMM Agent
+HeartbeatRM
+HelpBeam
+HelpU
+HelpWire
+HopToDesk
+iDrive
+I'm InTouch
+ImmyBot
+Impero Connect
+Instant Housecall
+Insync
+IntelliAdmin Remote Control
+InvGate
+Iperius Remote
+ISL Light
+ISL Online
+IT Agent
+Itarian
+ITSupport247 (ConnectWise)
+Ivanti Remote Control
+JollysFastVNC
+Jump Cloud
+Jump Desktop
+Kabuto
+Kaseya (VSA)
+KHelpDesk
+KickIdler
+KiTTY
+Komari
+Koofr
+LabTeach (Connectwise Automate)
+LabTech RMM (Now ConnectWise Automate)
+LANDesk
+Laplink Everywhere
+Laplink Gold
+Lavawall
+Level
+Level.io
+LightRmmAgent
+Lite Manager
+LiteManager
+LocalXpose
+LogMeIn
+LogMeIn rescue
+LS RMM
+Lunixar
+Manage Engine (Desktop Central)
+ManageEngine
+ManageEngine RMM Central
+ManageEngine ServiceDesk Plus
+MEGAsync
+MeshCentral
+Microsoft Quick Assist
+Mikogo
+Minexus
+Mini RMM Agent
+MioNet (Also known as WD Anywhere Access)
+MioNet (WD Anywhere Access)
+Miradore
+MobaXterm
+Mocha VNC Lite
+Monitic
+Mouse Without Borders
+Mremote
+mRemoteNG
+MSP360
+mstsc.exe (Microsoft Remote Desktop Connection)
+MultCloud
+MyGreenPC
+MyIVO
+N-Able Advanced Monitoring Agent
+N-able N-central
+N-ABLE Remote Access Software
+Naverisk
+Net Monitor for Employees
+NetBird
+NetLock RMM
+NetMaster
+Netop
+Netop Remote Control (aka Impero Connect)
+Netop Remote Control (Impero Connect)
+Netreo
+NetSupport Manager
+Neturo
+Netviewer
+Netviewer (GoToMeet)
+Nexus RMM (Scogo)
+Nezha
+ngrok
+Ninite Pro (Ninite Agent)
+NinjaOne (formerly NinjaRMM)
+NinjaRMM
+NoMachine
+NordLocker
+NoteOn-desktop sharing
+NTR Remote
+NVDA (Non-Visual Desktop Access)
+Obliance
+OCS inventory
+Onionshare
+Opale
+OpenDesk RMM Agent
+OpenUEM
+OpsBridge Agent
+OptiTune
+Overlord
+Pandora RC (eHorus)
+Panorama9
+Parallels Access
+Parsec
+pcAnywhere
+PChelpware
+Pcnow
+Pcvisit
+PDQ Connect
+Pilixo
+PiTunnel
+Pocket Cloud (Wyse)
+Pocket Controller
+Pocket Controller (Soti Xsight)
+ProxiPort
+PSEXEC
+PSEXEC (Clone)
+Pulseway
+PuTTY
+PuTTY Tray
+QQ IM-remote assistance
+Quest KACE Agent (formerly Dell KACE)
+Quick Assist
+RAdmin
+Rapid7
+RdClient
+RDCMan
+rdp2tcp
+RDPView
+rdpwrap
+RealVNC
+Remcos
+Remmina
+Remmon
+Remobo
+Remote Desktop Manager (Devolutions)
+Remote Desktop Plus
+Remote Manipulator System
+Remote Ripple
+Remote Utilities
+Remote.it
+RemoteAgentAgent
+RemoteCall
+Remotely
+RemotePass
+RemotePC
+RemotePulse
+RemoteUtilities
+RemoteView
+RemSupp
+RES Automation Manager
+RG System (RG Supervision)
+RMMCRAT
+RMMmax
+Rocket Remote Desktop
+Rodex RMM
+Roster
+Royal Apps
+Royal Server
+Royal TS
+RPort
+RuDesktop
+RunSmart
+RustDesk
+S3 Browser
+ScreenConnect
+ScreenMeet
+SecureCRT
+Seetrol
+Senso.cloud
+Sentinel RMM
+ServerEye
+SetMe PRO
+ShellHub
+ShowMyPC
+SimpleHelp
+Site24x7
+SkyFex
+SmartCode Web VNC
+SmartFTP
+SmarTTY
+Solar-PuTTY
+Sophos-Remote Management System
+Sorillus
+SparkRAT
+Splashtop
+Splashtop (Beta)
+Splashtop Remote
+SpyAnywhere
+SunLogin
+SuperOps
+SuperPuTTY
+Supremo
+Syncro
+Syncthing
+Synergy
+SysAid
+Syspectr
+Tactical RMM
+Tailscale
+Tanium
+Tanium Deploy
+TeamViewer
+TeleDesktop
+Teleport Connect
+Teramind
+Terminals
+TiFLUX
+TigerVNC
+TightVNC
+tmate
+ToDesk
+Total Software Deployment
+TrustConnect
+TurboMeeting
+Ultra VNC
+UltraViewer
+UltraVNC
+UniSystem RMM
+Veyon
+Vicarius vRx
+Visual Studio Dev Tunnel
+VIZOR
+VNC
+VNC Connect
+WebEx (Remote Access)
+WebRDP
+Weezo
+WinSCP
+X2Go
+Xeox
+Xpra
+XRDP
+Xshell
+Yandex.Disk
+Zabbix Agent
+Zecurit
+ZeroTier
+ZOC
+Zoho Assist
