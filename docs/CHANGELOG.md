@@ -1,4 +1,11 @@
-## Unreleased - LOLRMM catalogue watch
+## Unreleased - LOLRMM catalogue watch; block by default
+
+- **Default change: TeamViewer, AnyDesk and RustDesk now start ticked (blocked) in programs 1 and 2; Splashtop
+  still starts unticked (allowed).** This reverses the "allow four tools by default" part of 2026-10-14 for those
+  three. All three windows, `$DefaultVariant` (T1A1S0R1) and the README now agree. Before, the full kit allowed all
+  four while the Windows-only kit, the command-line default and the README's "What gets blocked" table blocked
+  three. A PC with a policy already installed still loads its installed choices. `Test-ImportWorkflow` asserts the
+  defaults in all three windows.
 
 - Add the `lolrmm-watch` workflow: a weekly check of the LOLRMM catalogue that opens one rolling pull request when it changes, with a report of tool, website-list, deny-rule and unreviewed-vendor changes. `policy/` is rebuilt only when the deny rules change.
 - README: "Customizing what gets blocked (with an AI agent)" - copy-paste prompts, a map of every block/allow setting, name lookups and a one-command rebuild (`Update-LolrmmBaseline.ps1 -Force`). Rebuild commands now pass `-OutDir .\policy` (the default writes to `src\appcontrol\policy`).

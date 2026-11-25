@@ -3,11 +3,15 @@ $ErrorActionPreference = 'Stop'
 function Assert($ok, [string]$message) { if (-not $ok) { throw $message }; Write-Host "PASS: $message" }
 $p1 = Get-ChildItem "$RepoRoot/kits/1/Block-The-Programs.v*.ps1" | Select-Object -First 1
 $p2 = Get-ChildItem "$RepoRoot/kits/2/Block-The-Websites.v*.ps1" | Select-Object -First 1
-foreach ($p in $p1, $p2) {
+$p3 = Get-ChildItem "$RepoRoot/kits/windows-only/Remote-Tools-Block-Windows.v*.ps1" | Select-Object -First 1
+# all three windows must agree with each other and with $DefaultVariant (T1A1S0R1) in Build-RmmAppControl
+foreach ($p in $p1, $p2, $p3) {
     $text = Get-Content -Raw $p.FullName
-    foreach ($name in 'TeamViewer', 'AnyDesk', 'Splashtop', 'RustDesk') {
-        Assert ($text -match ("New-Chk '" + $name + ''' \d+ \$false')) "$($p.Name): $name defaults unticked"
+    # scam-abused tools start blocked; Splashtop (often the shop's own support tool) starts allowed
+    foreach ($name in 'TeamViewer', 'AnyDesk', 'RustDesk') {
+        Assert ($text -match ("New-Chk '" + $name + ''' \d+ \$true')) "$($p.Name): $name defaults ticked (blocked)"
     }
+    Assert ($text -match "New-Chk 'Splashtop' \d+ \`$false") "$($p.Name): Splashtop defaults unticked (allowed)"
 }
 $websiteSource = Get-Content -Raw $p2.FullName
 Assert ($websiteSource.Contains("New-Btn 'Open list'")) 'third Open list button exists'

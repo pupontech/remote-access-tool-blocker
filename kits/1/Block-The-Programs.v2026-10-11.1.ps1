@@ -97,10 +97,10 @@ function New-Chk([string]$text, [int]$x, [bool]$on) {
     $c.Text = $text; $c.Checked = $on; $c.Location = New-Object Drawing.Point($x, 20); $c.AutoSize = $true
     $grp.Controls.Add($c); return $c
 }
-$chkT = New-Chk 'TeamViewer' 12 $false
-$chkA = New-Chk 'AnyDesk' 170 $false
+$chkT = New-Chk 'TeamViewer' 12 $true
+$chkA = New-Chk 'AnyDesk' 170 $true
 $chkS = New-Chk 'Splashtop' 310 $false
-$chkR = New-Chk 'RustDesk' 450 $false
+$chkR = New-Chk 'RustDesk' 450 $true
 $chkS.Add_Click({
     if ($chkS.Checked) {
         $r = [Windows.Forms.MessageBox]::Show(

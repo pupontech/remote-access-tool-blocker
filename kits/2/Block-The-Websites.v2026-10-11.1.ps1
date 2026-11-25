@@ -92,11 +92,11 @@ function New-Chk([string]$text, [int]$x, [bool]$on) {
     $c.Text = $text; $c.Checked = $on; $c.Location = New-Object Drawing.Point($x, 20); $c.AutoSize = $true
     $grp.Controls.Add($c); return $c
 }
-# All four tools are allowed by default, matching a fresh program 1 window.
-$chkT = New-Chk 'TeamViewer' 12 $false
-$chkA = New-Chk 'AnyDesk' 170 $false
+# TeamViewer, AnyDesk and RustDesk blocked by default, Splashtop allowed - same as every other window and T1A1S0R1.
+$chkT = New-Chk 'TeamViewer' 12 $true
+$chkA = New-Chk 'AnyDesk' 170 $true
 $chkS = New-Chk 'Splashtop' 310 $false
-$chkR = New-Chk 'RustDesk' 450 $false
+$chkR = New-Chk 'RustDesk' 450 $true
 
 $btnDo = New-Btn 'BUILD the list' 16 180 'PaleGreen'
 $btnFolder = New-Btn 'Open the list folder' 206 220 'LightSteelBlue'

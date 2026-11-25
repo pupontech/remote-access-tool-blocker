@@ -44,7 +44,7 @@ They are independent — run either one, or both. Neither needs the other.
    - `full-kit-eset-<version>.zip` — both programs, as folders `1` and `2`.
 2. Extract it anywhere on the PC. Keep the folders together — the launchers find the scripts relative to themselves.
 3. **Program 1:** open folder **`1`**, double-click **`START-HERE.bat`** and accept the administrator prompt.
-4. **TeamViewer / AnyDesk / Splashtop / RustDesk start unticked** (allowed) on a fresh PC. Ticked = blocked. An existing program policy still loads its installed choices.
+4. **TeamViewer, AnyDesk and RustDesk start ticked (blocked); Splashtop starts unticked (allowed)** on a fresh PC. Ticked = blocked. Untick a tool the client really uses. An existing program policy still loads its installed choices.
 5. Press **BLOCK**.
 6. **Program 2 (only if the PC runs ESET):** open folder **`2`**, double-click **`START-HERE.bat`**, press
    **BUILD**, then **import the file into ESET BY HAND** — the program cannot do it and cannot verify it.
@@ -75,7 +75,7 @@ toggle is set to. **Refresh status** lists recent events: `[3077]` means a progr
 
 **Program 2 BUILD** writes one combined file, `eset-blocked-urls.txt`, opens its folder with the file selected, opens the list itself in Notepad alongside the instructions, and copies the **full file path** to the clipboard (not the list contents). The path is also printed in the window. **Open the list folder** reopens it without rebuilding.
 
-Both programs start with TeamViewer, AnyDesk, Splashtop and RustDesk unticked (allowed). Their checkboxes are independent. Program 1 loads installed choices when an existing policy is detected.
+Both programs, and the Windows-only kit, start with TeamViewer, AnyDesk and RustDesk ticked (blocked) and Splashtop unticked (allowed). Their checkboxes are independent. Program 1 loads installed choices when an existing policy is detected.
 
 **Review before import:** the combined list now includes previously optional AV-update, SaaS and VPN domains. Review optional-tier rows in `url-review.csv` and remove services the client needs from the import file. The protected-root and allow-domain safety filters remain active. There is no second optional import file.
 
@@ -83,7 +83,7 @@ Both programs start with TeamViewer, AnyDesk, Splashtop and RustDesk unticked (a
 2. Add a new list of type **Blocked**, named **RMM scam block (lolrmm)**, with **List active** ticked.
 3. Inside it choose **Import**. Paste the copied **file path into File name**, then **Open**. If clipboard copy failed, browse to the file in the folder that opened. Do not paste the path into **Enter multiple values**.
 4. Click **OK** on every window to save.
-5. Test a website that actually appears in the generated file. AnyDesk is allowed by default, so it is not a valid default test.
+5. Test a website that actually appears in the generated file, for example `anydesk.com` if AnyDesk was left ticked.
 
 To undo, remove this named list or untick **List active**. Do not remove unrelated pre-existing entries. Program 2 does not apply the Windows program block or verify ESET import; use program 1 independently.
 
@@ -343,7 +343,7 @@ and do not rename them for a list-only edit.
 | **Stop blocking a vendor's programs** | same | Remove it from `$MainSigners` (or move it to `$OptionalSigners`) |
 | Never block a publisher, whatever the lists say | same | Add part of its certificate CN to `$NeverBlock`, in lower case with spaces and punctuation removed (for example `simontatham`) |
 | Default toggle state for a policy **build** | same | `$DefaultVariant` (`T1A1S0R1` = TeamViewer, AnyDesk, RustDesk blocked; Splashtop allowed) |
-| **Default checkbox state** in the windows | `kits/1/Block-The-Programs.v*.ps1`, `kits/2/Block-The-Websites.v*.ps1`, `kits/windows-only/Remote-Tools-Block-Windows.v*.ps1` | The last argument of `New-Chk '<Tool>' <x> $false` (`$true` = ticked = blocked). Kits 1 and 2 currently start unticked and the Windows-only kit starts ticked. Change all three together. |
+| **Default checkbox state** in the windows | `kits/1/Block-The-Programs.v*.ps1`, `kits/2/Block-The-Websites.v*.ps1`, `kits/windows-only/Remote-Tools-Block-Windows.v*.ps1` | The last argument of `New-Chk '<Tool>' <x> $true` (`$true` = ticked = blocked). All three currently start TeamViewer, AnyDesk and RustDesk ticked and Splashtop unticked, matching `$DefaultVariant`. Change all three together, plus `$DefaultVariant` and the assertion in `tests/Test-ImportWorkflow.ps1`, which checks the three agree. |
 | **Block extra websites** | `src/eset/Get-LolrmmUrlList.v*.ps1` | Add the domain to the `$ExtraDomain` default |
 | **Never block a website** (this domain and everything under it) | `kits/2/Block-The-Websites.v*.ps1` | Add it to `$allow = @('eset.com')` in the BUILD handler. Also add it to the `$AllowDomain` default in `Get-LolrmmUrlList` for command-line runs. **Kit 2 passes its own allow-list, which replaces the generator's default.** |
 | Leave a tool's websites out completely | `kits/2/Block-The-Websites.v*.ps1` | Add the tool's name to `$exTools`. It matches catalogue names with `-like *name*`. |
