@@ -8,3 +8,6 @@ dist/
 # test-harness scratch: the probe copies our tests generate next to the script under test
 _probe-*.ps1
 _chk*.ps1
+
+# report written by build/Update-LolrmmBaseline.ps1 -ReportPath .\lolrmm-report.md
+lolrmm-report.md

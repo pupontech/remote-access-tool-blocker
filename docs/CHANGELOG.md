@@ -1,6 +1,7 @@
 ## Unreleased - LOLRMM catalogue watch
 
 - Add the `lolrmm-watch` workflow: a weekly check of the LOLRMM catalogue that opens one rolling pull request when it changes, with a report of tool, website-list, deny-rule and unreviewed-vendor changes. `policy/` is rebuilt only when the deny rules change.
+- README: "Customizing what gets blocked (with an AI agent)" - copy-paste prompts, a map of every block/allow setting, name lookups and a one-command rebuild (`Update-LolrmmBaseline.ps1 -Force`). Rebuild commands now pass `-OutDir .\policy` (the default writes to `src\appcontrol\policy`).
 - Add `data/lolrmm-baseline/`, seeded from the catalogue the committed policy was built from (SHA256 87D366BB...).
 
 ## 2026.10.20.1 - ESET handoff failure recovery

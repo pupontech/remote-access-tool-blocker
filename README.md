@@ -287,6 +287,129 @@ reinstall.
 
 ---
 
+## Customizing what gets blocked (with an AI agent)
+
+You can ask a coding agent (Claude Code, Codex, Copilot and similar) to change what is blocked and what is
+allowed. This section has the prompts and the file map it needs, so it can make the change without exploring the
+repo first. **Point the agent at this section** ("read the README section *Customizing what gets blocked* first").
+
+### Prompts you can copy
+
+Replace the parts in `<angle brackets>`.
+
+```text
+Read README.md "Customizing what gets blocked" first. Then:
+Stop blocking <ScreenConnect> programs everywhere. Rebuild policy/ and show me the report.
+```
+
+```text
+Read README.md "Customizing what gets blocked" first. Then:
+Also block <Ping32> - programs and websites. Tell me if the catalogue has no certificate for it.
+```
+
+```text
+Read README.md "Customizing what gets blocked" first. Then:
+Never block these websites, our clients use them: <tailscale.com, sophos.com>.
+```
+
+```text
+Read README.md "Customizing what gets blocked" first. Then:
+Make <Splashtop> blocked by default in every kit (it stays a per-PC checkbox).
+```
+
+```text
+Read README.md "Customizing what gets blocked" first. Then:
+Go through the "Vendors that need a decision" in the latest lolrmm-watch PR / report and propose
+main, optional or leave-alone for each one, with a one-line reason. Don't change anything until I answer.
+```
+
+### Agent reference
+
+**Two layers, configured separately.** Allowing a tool usually means changing **both**.
+
+- **Program 1 (App Control):** blocks programs by their code-signing certificate. Its output, `policy/`, is
+  committed and has to be rebuilt.
+- **Program 2 (ESET):** blocks websites. The list is generated on the technician's PC when they press BUILD.
+
+Script filenames carry a version (`Name.vYYYY-MM-DD.N.ps1`). Glob for them (`src/appcontrol/Build-RmmAppControl.v*.ps1`)
+and do not rename them for a list-only edit.
+
+#### Where each setting lives
+
+| Goal | File | What to change |
+|---|---|---|
+| **Block a vendor's programs** | `src/appcontrol/Build-RmmAppControl.v*.ps1` | Add the signer name to `$MainSigners` |
+| Block only with `-IncludeOptional` (vendor also signs software clients need) | same | Add it to `$OptionalSigners` |
+| **Stop blocking a vendor's programs** | same | Remove it from `$MainSigners` (or move it to `$OptionalSigners`) |
+| Never block a publisher, whatever the lists say | same | Add part of its certificate CN to `$NeverBlock`, in lower case with spaces and punctuation removed (for example `simontatham`) |
+| Default toggle state for a policy **build** | same | `$DefaultVariant` (`T1A1S0R1` = TeamViewer, AnyDesk, RustDesk blocked; Splashtop allowed) |
+| **Default checkbox state** in the windows | `kits/1/Block-The-Programs.v*.ps1`, `kits/2/Block-The-Websites.v*.ps1`, `kits/windows-only/Remote-Tools-Block-Windows.v*.ps1` | The last argument of `New-Chk '<Tool>' <x> $false` (`$true` = ticked = blocked). Kits 1 and 2 currently start unticked and the Windows-only kit starts ticked. Change all three together. |
+| **Block extra websites** | `src/eset/Get-LolrmmUrlList.v*.ps1` | Add the domain to the `$ExtraDomain` default |
+| **Never block a website** (this domain and everything under it) | `kits/2/Block-The-Websites.v*.ps1` | Add it to `$allow = @('eset.com')` in the BUILD handler. Also add it to the `$AllowDomain` default in `Get-LolrmmUrlList` for command-line runs. **Kit 2 passes its own allow-list, which replaces the generator's default.** |
+| Leave a tool's websites out completely | `kits/2/Block-The-Websites.v*.ps1` | Add the tool's name to `$exTools`. It matches catalogue names with `-like *name*`. |
+| Mark a domain as *review before import* | `src/eset/Get-LolrmmUrlList.v*.ps1` | `$OptionalDomain`. It **is still in the import file**; it is only flagged in `url-review.csv`. |
+| Never block a shared platform root (CDNs, cloud hosts) | same | `$ProtectedRoot` |
+
+A new per-PC checkbox (a fifth toggle like `T`/`A`/`S`/`R`) is **not** a quick edit. It changes `$ToggleGroups`,
+all three windows, the variant naming and the 32 prebuilt variants in `policy/variants/`. Ask for a plan first.
+
+#### Looking up the exact names
+
+Signer names must match the certificate. The comparison ignores case and punctuation, but not wording.
+
+| You need | Look in | Column |
+|---|---|---|
+| Signers already blocked | `policy/signers.csv` | `Publisher` (`Tools` shows the tools they cover) |
+| Signers in the catalogue but not blocked, and why | `data/lolrmm-baseline/skipped-signers.csv` | `Signer`, `Reason` |
+| Every tool name in the catalogue | `data/lolrmm-baseline/tools.txt` | one name per line |
+| Every website entry, its tier and the tools behind it | `data/lolrmm-baseline/url-review.csv` | `Entry`, `Tier`, `Tools` |
+
+What the `Reason` values in `skipped-signers.csv` mean:
+
+- `not on the hand-checked vendor list`: adding the signer to `$MainSigners` will block it.
+- `optional vendor (use -IncludeOptional)`: it is already in `$OptionalSigners`.
+- `catalogue has no certificate bytes`: **adding it does nothing.** No rule can be built until LOLRMM publishes
+  the certificate. The only option is its websites.
+- `never-block safety list (...)`: `$NeverBlock` stopped it. Do not work around this without asking.
+- `certificate CN does not match the listed vendor`: the catalogue attached someone else's certificate to the
+  tool. Leave it alone.
+
+#### Rebuild and verify: one command
+
+After editing any of the lists above, run this from the repo root in Windows PowerShell 5.1. It needs Windows
+10/11 Pro or Enterprise, or Windows Server, because of the ConfigCI module.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build\Update-LolrmmBaseline.ps1 -Force -ReportPath .\lolrmm-report.md
+```
+
+The command:
+
+- runs both generators against the live catalogue;
+- rebuilds `policy/` only when the deny rules changed, putting the output in the right folder;
+- refreshes `data/lolrmm-baseline/`;
+- writes a report of exactly what the edit added and removed: rules, blocked websites and unreviewed signers.
+
+**Read the report.** If a change you expected is missing, the name did not match. Check it against the tables
+above.
+
+Add `-SkipPolicy` on a PC without ConfigCI to check only the website list. Do not commit `lolrmm-report.md`.
+
+#### Before you commit
+
+- `.ps1` files must be **pure ASCII with no BOM**. Windows PowerShell 5.1 misreads anything else. `.bat` files must
+  be ASCII with CRLF line endings. CI enforces both.
+- Commit the script edit together with `data/lolrmm-baseline/`, plus `policy/` when it was rebuilt.
+- If `policy/` changed, add a `docs/CHANGELOG.md` entry, bump `VERSION`, and test on a PC in **Audit** mode
+  before Enforce.
+- Website-list edits reach technicians only in a new release ZIP (`build/build-release.sh`).
+- Never change `$PolicyGuid` (see [Configuration](#configuration)).
+
+The weekly `lolrmm-watch` workflow runs the same script without `-Force`. It opens a pull request when LOLRMM
+itself changes, and its "Vendors that need a decision" list is the usual starting point for the last prompt above.
+
+---
+
 ## Rebuilding the policy and the release ZIPs
 
 The pre-built policies in `policy/` are committed, so ordinary use needs nothing else. Rebuild when you want to
@@ -301,10 +424,10 @@ To rebuild the **release ZIPs** (both kits, with the `1\`/`2\` split asserted on
 Requires **Windows 10/11 Pro or Enterprise** (the ConfigCI module) and PowerShell 5.1:
 
 ```powershell
-# from the repo root, in an elevated PowerShell
-.\src\appcontrol\Build-RmmAppControl.v2026-10-11.3.ps1
-.\src\appcontrol\Build-RmmAppControl.v2026-10-11.3.ps1 -IncludeOptional        # add school/enterprise vendors
-.\src\appcontrol\Build-RmmAppControl.v2026-10-11.3.ps1 -ExcludeSigner "Vendor Name"
+# from the repo root, in an elevated PowerShell. Without -OutDir it writes to src\appcontrol\policy, not policy\
+.\src\appcontrol\Build-RmmAppControl.v2026-10-11.3.ps1 -OutDir .\policy
+.\src\appcontrol\Build-RmmAppControl.v2026-10-11.3.ps1 -OutDir .\policy -IncludeOptional        # add school/enterprise vendors
+.\src\appcontrol\Build-RmmAppControl.v2026-10-11.3.ps1 -OutDir .\policy -ExcludeSigner "Vendor Name"
 ```
 
 Then install the result:
