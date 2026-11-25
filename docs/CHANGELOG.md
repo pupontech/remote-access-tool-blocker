@@ -1,3 +1,8 @@
+## Unreleased - LOLRMM catalogue watch
+
+- Add the `lolrmm-watch` workflow: a weekly check of the LOLRMM catalogue that opens one rolling pull request when it changes, with a report of tool, website-list, deny-rule and unreviewed-vendor changes. `policy/` is rebuilt only when the deny rules change.
+- Add `data/lolrmm-baseline/`, seeded from the catalogue the committed policy was built from (SHA256 87D366BB...).
+
 ## 2026.10.20.1 - ESET handoff failure recovery
 
 - Keep opening the import guide when ESET discovery or startup fails; report the ESET error separately.

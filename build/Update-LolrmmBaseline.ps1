@@ -123,7 +123,7 @@ if (-not $SkipPolicy) {
     $ruleKey = { '{0} | {1} | {2} | {3}' -f $_.Tier, $_.Kind, $_.Publisher, $_.CertRoot }
     $ruleLabel = @{}
     $newRules = Read-Rows (Join-Path $polOut 'signers.csv')
-    foreach ($r in @($oldRules) + @($newRules)) { $ruleLabel[(& $ruleKey $r)] = "$($r.Tier) $($r.Kind): $($r.Publisher) - $($r.Tools)" }
+    @($oldRules) + @($newRules) | ForEach-Object { $ruleLabel[(& $ruleKey)] = "$($_.Tier) $($_.Kind): $($_.Publisher) - $($_.Tools)" }
     $ruleDelta = Get-Delta @($oldRules | ForEach-Object $ruleKey) @($newRules | ForEach-Object $ruleKey)
     $newSkipped = Read-Rows (Join-Path $polOut 'skipped-signers.csv')
     if ($ruleDelta.Added.Count -or $ruleDelta.Removed.Count) {
@@ -165,10 +165,11 @@ $md.Add(''); $md.Add("Block list: $($oldBlock.Count) -> $($newBlock.Count) entri
 $bd = Get-Delta $oldBlock $newBlock
 Add-Section 'Now blocked' $bd.Added ''
 Add-Section 'No longer blocked' $bd.Removed ''
-$optKey = { "$($_.Entry) ($($_.Tools))" }
-$od = Get-Delta @($oldReview | Where-Object Tier -ne 'main' | ForEach-Object $optKey) @($newReview | Where-Object Tier -ne 'main' | ForEach-Object $optKey)
-Add-Section 'Optional (not blocked by default) - added' $od.Added ''
-Add-Section 'Optional (not blocked by default) - removed' $od.Removed ''
+# keyed on the entry alone: a tool merely joining an existing entry is not a change worth reporting
+$optTools = @{}; foreach ($r in @($oldReview) + @($newReview)) { $optTools[$r.Entry] = $r.Tools }
+$od = Get-Delta @($oldReview | Where-Object Tier -ne 'main' | ForEach-Object { $_.Entry }) @($newReview | Where-Object Tier -ne 'main' | ForEach-Object { $_.Entry })
+Add-Section 'Optional (not blocked by default) - added' @($od.Added | ForEach-Object { "$_ ($($optTools[$_]))" }) ''
+Add-Section 'Optional (not blocked by default) - removed' @($od.Removed | ForEach-Object { "$_ ($($optTools[$_]))" }) ''
 
 $md.Add(''); $md.Add('### App Control policy')
 $md.Add('')
@@ -183,13 +184,21 @@ if ($SkipPolicy) {
 }
 
 if (-not $SkipPolicy) {
-    $sk = { "$($_.Tool) -> $($_.Signer)" }
-    $sd = Get-Delta @($oldSkipped | Where-Object Reason -like 'not on the hand-checked*' | ForEach-Object $sk) @($newSkipped | Where-Object Reason -like 'not on the hand-checked*' | ForEach-Object $sk)
+    # keyed on the vendor name alone: the catalogue often moves an already-reviewed certificate to another tool
+    $unrev = @($newSkipped | Where-Object Reason -like 'not on the hand-checked*')
+    $sd = Get-Delta @($oldSkipped | ForEach-Object { $_.Signer }) @($unrev | ForEach-Object { $_.Signer })
     $md.Add(''); $md.Add('### Vendors that need a decision')
     $md.Add('')
     if ($sd.Added.Count) {
-        $md.Add('These signers are new in the catalogue and are not blocked because they are on neither vendor list. To block one, add it to $MainSigners (or $OptionalSigners) in Build-RmmAppControl and rebuild.')
-        Add-Section 'Unreviewed signers' $sd.Added ''
+        # a signer only becomes a rule if the catalogue ships its certificate; say so, or the list invites no-op edits
+        $hasBytes = @{}
+        foreach ($t in $tools) { foreach ($c in @($t.CodeSigning.certificates)) { if ($c -and $c.certificate_der_base64) { $hasBytes[[string]$c.signer_name] = $true } } }
+        $md.Add('These signers are new in the catalogue and are not blocked because they are on neither vendor list. To block one, add it to $MainSigners (or $OptionalSigners) in Build-RmmAppControl and rebuild. Signers marked *no certificate* cannot become a rule until LOLRMM publishes the certificate.')
+        Add-Section 'Unreviewed signers' @($sd.Added | ForEach-Object {
+                $s = $_
+                $note = if ($hasBytes.ContainsKey($s)) { '' } else { ' - no certificate' }
+                "$s ($((@($unrev | Where-Object Signer -eq $s | ForEach-Object Tool) | Sort-Object -Unique) -join '; '))$note"
+            }) ''
     } else {
         $md.Add('None.')
     }
